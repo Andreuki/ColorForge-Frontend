@@ -1,0 +1,490 @@
+<app-page-wrapper>
+  <section class="mx-auto max-w-6xl px-6 py-6">
+    <app-section-title title="ANÁLISIS DE MINIATURA" subtitle="Inspección detallada y guía paso a paso" />
+
+    <!-- ======= LOADER ======= -->
+    @if (loading()) {
+      <div class="flex items-center justify-center min-h-[60vh] text-cf-parchment-muted font-display text-lg flex-col gap-3">
+        <div class="w-8 h-8 rounded-full border-2 border-gold-subtle border-t-cf-gold animate-spin"></div>
+        <p class="text-cf-parchment-muted">Cargando análisis...</p>
+      </div>
+    }
+
+    <!-- ======= ERROR ======= -->
+    @if (!loading() && errorMessage()) {
+      <div class="mx-8 my-8 rounded-sm border border-cf-crimson bg-cf-surface p-5 text-cf-crimson-light">
+        <p>{{ errorMessage() }}</p>
+        <a routerLink="/upload" class="inline-block mt-3 border border-gold-subtle text-cf-parchment-dim px-4 py-2 rounded-sm hover:border-cf-gold transition-colors text-sm">Volver a subir</a>
+      </div>
+    }
+
+    <!-- ======= CONTENIDO ======= -->
+    @if (!loading() && analysis()) {
+      <div class="py-6">
+
+        <!-- Banner error IA -->
+        @if (analysis()!.aiError) {
+          <div class="bg-cf-surface border border-cf-crimson text-cf-crimson-light rounded-sm p-3 mb-6 text-sm">
+            El análisis de IA no está disponible en este momento. Se muestran datos parciales.
+          </div>
+        }
+
+        <!-- Cabecera: imagen + botón publicar -->
+        <div class="grid gap-6 bg-cf-surface2 rounded-sm p-5 mb-5 md:grid-cols-[280px_1fr] border border-gold-subtle">
+          <img [src]="imageUrlFull()" alt="Miniatura analizada" class="w-full h-56 object-cover rounded-sm" />
+          <div class="flex flex-col justify-center">
+            <h1 class="font-display text-cf-gold text-5xl font-bold uppercase tracking-widest">ANÁLISIS DE MINIATURA</h1>
+            <p class="text-cf-parchment-muted text-xs mt-2">{{ analysis()!.createdAt | date:'dd/MM/yyyy' }}</p>
+            <button class="bg-gradient-to-br from-cf-gold to-cf-gold-dim text-cf-black font-heading rounded-sm px-6 py-3 hover:shadow-gold-lg transition-all mt-4 w-fit uppercase text-[0.75rem] tracking-widest" (click)="openModal()">Publicar en galería</button>
+          </div>
+        </div>
+
+        <!-- Tabs de navegación -->
+        <nav class="bg-cf-surface rounded-sm p-4 flex items-center gap-2 flex-wrap mb-6 border border-gold-subtle">
+          <button class="border border-gold-subtle text-cf-parchment-dim rounded-sm px-4 py-1.5 text-sm hover:border-cf-gold hover:text-cf-gold transition-all" [class.border-cf-gold]="activeTab() === 'identification'" [class.text-cf-gold]="activeTab() === 'identification'" (click)="setTab('identification')">Identificación</button>
+          <button class="border border-gold-subtle text-cf-parchment-dim rounded-sm px-4 py-1.5 text-sm hover:border-cf-gold hover:text-cf-gold transition-all" [class.border-cf-gold]="activeTab() === 'scheme'" [class.text-cf-gold]="activeTab() === 'scheme'" (click)="setTab('scheme')">Esquema</button>
+          <button class="border border-gold-subtle text-cf-parchment-dim rounded-sm px-4 py-1.5 text-sm hover:border-cf-gold hover:text-cf-gold transition-all" [class.border-cf-gold]="activeTab() === 'primer'" [class.text-cf-gold]="activeTab() === 'primer'" (click)="setTab('primer')">Imprimación</button>
+          <button class="border border-gold-subtle text-cf-parchment-dim rounded-sm px-4 py-1.5 text-sm hover:border-cf-gold hover:text-cf-gold transition-all" [class.border-cf-gold]="activeTab() === 'guide'" [class.text-cf-gold]="activeTab() === 'guide'" (click)="setTab('guide')">Guía paso a paso</button>
+          <button class="border border-gold-subtle text-cf-parchment-dim rounded-sm px-4 py-1.5 text-sm hover:border-cf-gold hover:text-cf-gold transition-all" [class.border-cf-gold]="activeTab() === 'advanced'" [class.text-cf-gold]="activeTab() === 'advanced'" (click)="setTab('advanced')">Técnicas avanzadas</button>
+          <button class="border border-gold-subtle text-cf-parchment-dim rounded-sm px-4 py-1.5 text-sm hover:border-cf-gold hover:text-cf-gold transition-all" [class.border-cf-gold]="activeTab() === 'tips'" [class.text-cf-gold]="activeTab() === 'tips'" (click)="setTab('tips')">Tips</button>
+          <button class="border border-gold-subtle text-cf-parchment-dim rounded-sm px-4 py-1.5 text-sm hover:border-cf-gold hover:text-cf-gold transition-all" [class.border-cf-gold]="activeTab() === 'materials'" [class.text-cf-gold]="activeTab() === 'materials'" (click)="setTab('materials')">Materiales</button>
+        </nav>
+
+        <!-- ===== SECCIÓN 1: Identificación ===== -->
+        @if (activeTab() === 'identification') {
+          @defer (on immediate) {
+            <section class="bg-cf-surface2 rounded-sm p-5 mb-5 border border-gold-subtle">
+              @if (analysis()!.miniatureIdentification) {
+                @let ident = analysis()!.miniatureIdentification!;
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                  <div class="bg-cf-surface rounded-sm p-4 mb-3 border border-gold-subtle">
+                    <span class="text-cf-parchment-muted text-xs uppercase tracking-widest block mb-1">Facción detectada</span>
+                    <span class="text-cf-parchment font-bold text-sm">{{ ident.detectedFaction }}</span>
+                  </div>
+                  <div class="bg-cf-surface rounded-sm p-4 mb-3 border border-gold-subtle">
+                    <span class="text-cf-parchment-muted text-xs uppercase tracking-widest block mb-1">Tipo de miniatura</span>
+                    <span class="text-cf-parchment font-bold text-sm">{{ ident.miniatureType }}</span>
+                  </div>
+                  <div class="bg-cf-surface rounded-sm p-4 mb-3 border border-gold-subtle">
+                    <span class="text-cf-parchment-muted text-xs uppercase tracking-widest block mb-1">Unidad específica</span>
+                    <span class="text-cf-parchment font-bold text-sm">{{ ident.specificUnit }}</span>
+                  </div>
+                  <div class="bg-cf-surface rounded-sm p-4 mb-3 border border-gold-subtle">
+                    <span class="text-cf-parchment-muted text-xs uppercase tracking-widest block mb-1">Estado actual</span>
+                    <span class="text-cf-parchment font-bold text-sm">{{ ident.currentPaintingState }}</span>
+                  </div>
+                  <div class="bg-cf-surface rounded-sm p-4 mb-3 border border-gold-subtle">
+                    <span class="text-cf-parchment-muted text-xs uppercase tracking-widest block mb-1">Imprimada</span>
+                    <span class="text-cf-parchment font-bold text-sm">{{ ident.isPrimed ? 'Sí' : 'No' }}</span>
+                  </div>
+                  @if (ident.primerColor) {
+                    <div class="bg-cf-surface rounded-sm p-4 mb-3 border border-gold-subtle">
+                      <span class="text-cf-parchment-muted text-xs uppercase tracking-widest block mb-1">Color de imprimación</span>
+                      <span class="text-cf-parchment font-bold text-sm">{{ ident.primerColor }}</span>
+                    </div>
+                  }
+                </div>
+                <div class="flex items-center gap-2 mt-3">
+                  <span class="text-cf-parchment-muted text-xs uppercase tracking-widest">Confianza de identificación:</span>
+                  <span class="text-xs font-bold px-2 py-1 rounded-sm" [ngClass]="confidenceBadgeClass(ident.confidence)">{{ ident.confidence }}</span>
+                </div>
+              } @else {
+                <p class="flex items-center justify-center min-h-[60vh] text-cf-parchment-muted font-display text-lg">No hay datos de identificación disponibles.</p>
+              }
+            </section>
+          } @placeholder {
+            <div class="text-cf-parchment-muted text-sm">Cargando...</div>
+          } @loading {
+            <div class="flex items-center gap-2 text-cf-parchment-muted"><div class="w-4 h-4 rounded-full border-2 border-gold-subtle border-t-cf-gold animate-spin"></div></div>
+          }
+        }
+
+        <!-- ===== SECCIÓN 2: Esquema de color ===== -->
+        @if (activeTab() === 'scheme') {
+          <section class="bg-cf-surface2 rounded-sm p-5 mb-5 border border-gold-subtle">
+            <h2 class="font-display text-cf-parchment font-bold text-xl">Colores detectados</h2>
+            <div class="flex flex-wrap gap-2 mt-3">
+              @for (hex of analysis()!.detectedColors; track hex) {
+                <div class="flex flex-col items-center">
+                  <div
+                    class="w-10 h-10 rounded-full border-2 border-cf-steel shadow-lg"
+                    [style.background-color]="hex"
+                  ></div>
+                  <span class="text-xs mt-1 font-mono text-cf-parchment-muted">{{ hex }}</span>
+                </div>
+              } @empty {
+                <p class="flex items-center justify-center min-h-[60vh] text-cf-parchment-muted font-display text-lg">No se detectaron colores.</p>
+              }
+            </div>
+
+            @if (analysis()!.recommendedScheme) {
+              <div class="bg-cf-surface rounded-sm p-4 mb-3 mt-5 border-l-4 border-cf-gold">
+                <span class="text-cf-parchment-muted text-xs uppercase tracking-widest block mb-1">Esquema recomendado</span>
+                <span class="text-cf-gold font-bold text-sm">{{ analysis()!.recommendedScheme }}</span>
+              </div>
+            }
+
+            @if (analysis()!.schemeEvaluation) {
+              <div class="bg-cf-surface rounded-sm p-4 mb-3 border border-gold-subtle">
+                <h3 class="font-display text-cf-parchment font-bold text-xl">Evaluación del esquema</h3>
+                <p class="text-cf-parchment-dim text-sm mt-2 leading-relaxed">{{ analysis()!.schemeEvaluation }}</p>
+              </div>
+            }
+
+            @if (analysis()!.schemeEvaluationSummary) {
+              <div class="bg-cf-surface rounded-sm p-4 mb-3 border-l-4 border-cf-gold">
+                <p class="text-cf-parchment-dim text-sm leading-relaxed">{{ analysis()!.schemeEvaluationSummary }}</p>
+              </div>
+            }
+
+            @if (analysis()!.officialColorScheme) {
+              @let scheme = analysis()!.officialColorScheme!;
+              <div class="bg-cf-surface rounded-sm p-4 mb-3 border border-gold-subtle">
+                <h3 class="font-display text-cf-parchment font-bold text-xl">Esquema oficial de facción</h3>
+                @if (factionImageUrl()) {
+                  <img
+                    [src]="factionImageUrl()!"
+                    [alt]="analysis()?.officialColorScheme?.factionName"
+                    class="w-full h-48 object-cover rounded-sm mb-4"
+                  />
+                }
+                <p class="text-cf-parchment-dim text-sm mt-2"><strong>Facción:</strong> {{ scheme.factionName }}</p>
+                <p class="text-cf-parchment-dim text-sm mt-2">{{ scheme.canonicalSchemeDescription }}</p>
+                @if (scheme.deviationsFromCanon) {
+                  <p class="text-cf-crimson-light text-sm mt-2">Desviaciones del canon: {{ scheme.deviationsFromCanon }}</p>
+                }
+                @if (scheme.alternativeSchemes.length > 0) {
+                  <p class="text-cf-parchment-muted text-xs uppercase tracking-widest mt-3"><strong>Esquemas alternativos:</strong></p>
+                  <ul class="list-disc pl-5 text-cf-parchment-dim text-sm mt-1">
+                    @for (alt of scheme.alternativeSchemes; track alt) {
+                      <li>{{ alt }}</li>
+                    }
+                  </ul>
+                }
+              </div>
+            }
+
+          </section>
+        }
+
+        <!-- ===== SECCIÓN 3: Imprimación ===== -->
+        @if (activeTab() === 'primer') {
+          <section class="bg-cf-surface2 rounded-sm p-5 mb-5 border border-gold-subtle">
+            @if (analysis()!.miniatureIdentification && !analysis()!.miniatureIdentification!.isPrimed) {
+              <div class="bg-cf-surface border border-cf-crimson text-cf-crimson-light rounded-sm p-3 mb-4 text-sm">
+                <strong>¡Atención!</strong> La miniatura no parece estar imprimada. Imprimar es el primer paso antes de pintar.
+              </div>
+            }
+            @if (analysis()!.primerAdvice) {
+              <div class="bg-cf-surface rounded-sm p-4 mb-3 border border-gold-subtle">
+                <h2 class="font-display text-cf-parchment font-bold text-xl">Consejo de imprimación</h2>
+                <p class="text-cf-parchment-dim text-sm mt-2 leading-relaxed">{{ analysis()!.primerAdvice }}</p>
+              </div>
+            } @else {
+              <p class="flex items-center justify-center min-h-[60vh] text-cf-parchment-muted font-display text-lg">No hay consejo de imprimación disponible.</p>
+            }
+          </section>
+        }
+
+        <!-- ===== SECCIÓN 4: Guía paso a paso ===== -->
+        @if (activeTab() === 'guide') {
+          @defer (on viewport) {
+            <section class="bg-cf-surface2 rounded-sm p-5 mb-5 border border-gold-subtle">
+              @if (analysis()!.stepByStepGuide && analysis()!.stepByStepGuide!.length > 0) {
+                <div class="bg-cf-surface2 rounded-sm p-5 mb-5">
+                  @for (step of analysis()!.stepByStepGuide!; track step.stepNumber; let i = $index) {
+                    <div class="bg-cf-surface rounded-sm p-4 mb-3 border border-gold-subtle" [class.accordion-open]="isStepOpen(i)">
+
+                      <!-- Cabecera del paso -->
+                      <button class="w-full text-left" (click)="toggleStep(i)">
+                        <span class="text-cf-parchment-muted text-xs uppercase tracking-widest mr-2">Paso {{ step.stepNumber }}</span>
+                        <span class="text-cf-parchment font-bold text-sm">{{ step.title }}</span>
+                        <div class="flex items-center gap-2 mt-2 flex-wrap">
+                          <span class="text-cf-parchment-dim text-xs">{{ step.zone }}</span>
+                          <span class="text-xs font-bold px-2 py-1 rounded-sm" [ngClass]="difficultyClass(step.difficulty)">{{ step.difficulty }}</span>
+                          <span class="text-cf-parchment-muted text-xs">{{ step.estimatedTime }}</span>
+                        </div>
+                        <span class="text-cf-gold text-xs">{{ isStepOpen(i) ? '?' : '?' }}</span>
+                      </button>
+
+                      <!-- Cuerpo del paso -->
+                      @if (isStepOpen(i)) {
+                        <div class="mt-3 border-t border-gold-subtle pt-3">
+                          <p class="text-cf-parchment-dim text-sm leading-relaxed">{{ step.description }}</p>
+
+                          <div class="bg-cf-surface2 rounded-sm p-4 mt-3 border border-gold-subtle">
+                            <h4 class="text-cf-parchment font-bold text-sm">Técnica: {{ step.technique }}</h4>
+                            <p class="text-cf-parchment-muted text-xs mt-1 leading-relaxed">{{ step.techniqueExplanation }}</p>
+                          </div>
+
+                          <!-- Paleta de pinturas -->
+                          <div class="bg-cf-surface2 rounded-sm p-4 mt-3 border border-gold-subtle">
+                            <h4 class="text-cf-parchment-muted text-xs uppercase tracking-widest mb-2">Paleta de pinturas</h4>
+                            <div class="grid grid-cols-5 gap-2 text-cf-parchment-muted text-xs uppercase tracking-widest mb-2">
+                              <div>Color</div>
+                              <div>Citadel</div>
+                              <div>Vallejo</div>
+                              <div>AK</div>
+                              <div>Army Painter</div>
+                            </div>
+                            <div class="grid grid-cols-5 gap-2 text-cf-parchment-dim text-xs">
+                              <div class="w-3 h-3 rounded-full inline-block flex-shrink-0 mt-1" [style.background]="step.colorHex" [title]="step.colorHex"></div>
+                              <div>{{ step.citadelPaint }}</div>
+                              <div>{{ step.vallejoPaint }}</div>
+                              <div>{{ step.akPaint }}</div>
+                              <div>{{ step.armyPainterPaint }}</div>
+                            </div>
+                          </div>
+
+                          <!-- Error común -->
+                          @if (step.commonMistakes) {
+                            <div class="bg-cf-surface border border-cf-crimson text-cf-crimson-light rounded-sm p-3 mt-3 text-sm">
+                              <strong>Error común:</strong> {{ step.commonMistakes }}
+                            </div>
+                          }
+
+                          <!-- Pro Tip -->
+                          @if (step.proTip) {
+                            <div class="bg-cf-surface border border-cf-gold text-cf-gold rounded-sm p-3 mt-3 text-sm">
+                              <strong>Pro Tip:</strong> {{ step.proTip }}
+                            </div>
+                          }
+
+                          <!-- Videos de YouTube -->
+                          @if (step.videoReferences && step.videoReferences.length > 0) {
+                            <div class="bg-cf-surface2 rounded-sm p-4 mt-3 border border-gold-subtle">
+                              <h4 class="text-cf-parchment font-bold text-sm">Vídeos de referencia</h4>
+                              <div class="mt-2 space-y-2">
+                                @for (video of step.videoReferences; track video.title) {
+                                  <a
+                                    [href]="youtubeUrl(video.searchQuery)"
+                                    target="_blank"
+                                    rel="noopener noreferrer"
+                                    class="block text-cf-parchment-dim text-sm hover:text-cf-gold transition-colors"
+                                  >
+                                    {{ video.title }}
+                                    <span class="text-cf-parchment-muted text-xs">· {{ video.channel }}</span>
+                                  </a>
+                                }
+                              </div>
+                            </div>
+                          }
+                        </div>
+                      }
+                    </div>
+                  }
+                </div>
+              } @else {
+                <p class="flex items-center justify-center min-h-[60vh] text-cf-parchment-muted font-display text-lg">No hay guía paso a paso disponible.</p>
+              }
+            </section>
+          } @placeholder {
+            <div class="text-cf-parchment-muted text-sm">Desplázate para cargar la guía...</div>
+          } @loading {
+            <div class="flex items-center gap-2 text-cf-parchment-muted"><div class="w-4 h-4 rounded-full border-2 border-gold-subtle border-t-cf-gold animate-spin"></div> Cargando guía...</div>
+          }
+        }
+
+        <!-- ===== SECCIÓN 5: Técnicas avanzadas ===== -->
+        @if (activeTab() === 'advanced') {
+          <section class="bg-cf-surface2 rounded-sm p-5 mb-5 border border-gold-subtle">
+            @if (analysis()!.advancedTechniques && analysis()!.advancedTechniques!.length > 0) {
+              <div class="grid gap-3">
+                @for (tech of analysis()!.advancedTechniques!; track tech.name) {
+                  <div class="bg-cf-surface rounded-sm p-4 mb-3 flex gap-4 items-start border border-gold-subtle">
+                    <div class="flex-1 min-w-0">
+                      <div class="flex items-center justify-between">
+                        <h3 class="text-cf-parchment font-bold text-sm">{{ tech.name }}</h3>
+                        <span class="text-xs font-bold px-2 py-1 rounded-sm" [ngClass]="difficultyClass(tech.difficulty)">{{ tech.difficulty }}</span>
+                      </div>
+                      <p class="text-cf-parchment-muted text-xs mt-1 leading-relaxed">Zona: {{ tech.applicableZone }}</p>
+                      <p class="text-cf-parchment-dim text-xs mt-1 leading-relaxed">{{ tech.description }}</p>
+                      @if (tech.videoSearchQuery) {
+                        <a
+                          [href]="youtubeUrl(tech.videoSearchQuery)"
+                          target="_blank"
+                          rel="noopener noreferrer"
+                          class="inline-block mt-2 text-cf-parchment-dim text-xs hover:text-cf-gold transition-colors"
+                        >Ver tutoriales</a>
+                      }
+                    </div>
+                  </div>
+                }
+              </div>
+            } @else {
+              <p class="flex items-center justify-center min-h-[60vh] text-cf-parchment-muted font-display text-lg">No hay técnicas avanzadas disponibles.</p>
+            }
+          </section>
+        }
+
+        <!-- ===== SECCIÓN 6: Tips ===== -->
+        @if (activeTab() === 'tips') {
+          <section class="bg-cf-surface2 rounded-sm p-5 mb-5 border border-gold-subtle">
+            @if (analysis()!.paintingTips && analysis()!.paintingTips!.length > 0) {
+              <ul class="space-y-2">
+                @for (tip of analysis()!.paintingTips!; track tip) {
+                  <li class="bg-cf-surface rounded-sm p-4 mb-3 text-cf-parchment-dim text-sm border border-gold-subtle">{{ tip }}</li>
+                }
+              </ul>
+            } @else {
+              <p class="flex items-center justify-center min-h-[60vh] text-cf-parchment-muted font-display text-lg">No hay tips disponibles.</p>
+            }
+          </section>
+        }
+
+        <!-- ===== SECCIÓN 7: Materiales ===== -->
+        @if (activeTab() === 'materials') {
+          @defer (on idle) {
+            <section class="bg-cf-surface2 rounded-sm p-5 mb-5 border border-gold-subtle">
+              @if (analysis()!.materialsAndTools) {
+                @let mt = analysis()!.materialsAndTools!;
+
+                <!-- Coste y tiempo destacados -->
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-4 mb-4">
+                  <div class="bg-cf-surface rounded-sm p-5 mb-5 border border-gold-subtle">
+                    <span class="text-cf-parchment-muted text-xs uppercase tracking-widest block mb-1">Coste estimado</span>
+                    <span class="text-cf-parchment font-bold text-lg">{{ mt.estimatedTotalCost }}</span>
+                  </div>
+                  <div class="bg-cf-surface rounded-sm p-5 mb-5 border border-gold-subtle">
+                    <span class="text-cf-parchment-muted text-xs uppercase tracking-widest block mb-1">Tiempo total</span>
+                    <span class="text-cf-parchment font-bold text-lg">{{ mt.estimatedTotalTime }}</span>
+                  </div>
+                </div>
+
+                <!-- Imprimaciones -->
+                @if (mt.primersNeeded && mt.primersNeeded.length > 0) {
+                  <div class="bg-cf-surface rounded-sm p-5 mb-5 border border-gold-subtle">
+                    <h3 class="font-display text-cf-parchment font-bold text-xl mb-3">Imprimaciones necesarias</h3>
+                    <div class="overflow-x-auto">
+                      <table class="w-full text-sm">
+                        <thead>
+                          <tr class="text-cf-parchment-muted text-xs uppercase tracking-widest border-b border-gold-subtle"><th class="text-left py-2">Producto</th><th class="text-left py-2">Marca</th><th class="text-left py-2">Color</th><th class="text-left py-2">Propósito</th></tr>
+                        </thead>
+                        <tbody class="text-cf-parchment-dim text-sm">
+                          @for (p of mt.primersNeeded; track p.product) {
+                            <tr class="border-t border-gold-subtle"><td class="py-2">{{ p.product }}</td><td class="py-2">{{ p.brand }}</td><td class="py-2">{{ p.color }}</td><td class="py-2">{{ p.purpose }}</td></tr>
+                          }
+                        </tbody>
+                      </table>
+                    </div>
+                  </div>
+                }
+
+                <!-- Lista de pinturas -->
+                @if (allPaints().length > 0) {
+                  <div class="bg-cf-surface rounded-sm p-5 mb-5 border border-gold-subtle">
+                    <h3 class="font-display text-cf-parchment font-bold text-xl mb-3">Lista de pinturas</h3>
+                    <div class="overflow-x-auto">
+                      <table class="w-full text-sm">
+                        <thead>
+                          <tr class="text-cf-parchment-muted text-xs uppercase tracking-widest border-b border-gold-subtle"><th class="text-left py-2">Color</th><th class="text-left py-2">Zona</th><th class="text-left py-2">Fase</th><th class="text-left py-2">Citadel</th><th class="text-left py-2">Vallejo</th><th class="text-left py-2">AK</th><th class="text-left py-2">Army Painter</th></tr>
+                        </thead>
+                        <tbody class="text-cf-parchment-dim text-sm">
+                          @for (paint of allPaints(); track paint.zone + paint.paintingStage + paint.citadel) {
+                            <tr class="border-t border-gold-subtle">
+                              <td class="py-2"><div class="w-3 h-3 rounded-full inline-block flex-shrink-0" [style.background]="paint.hex" [title]="paint.hex"></div></td>
+                              <td class="py-2">{{ paint.zone }}</td>
+                              <td class="py-2">{{ paint.paintingStage }}</td>
+                              <td class="py-2">{{ paint.citadel }}</td>
+                              <td class="py-2">{{ paint.vallejo }}</td>
+                              <td class="py-2">{{ paint.ak }}</td>
+                              <td class="py-2">{{ paint.armyPainter }}</td>
+                            </tr>
+                          }
+                        </tbody>
+                      </table>
+                    </div>
+                  </div>
+                }
+
+                <!-- Pinceles -->
+                @if (mt.brushesNeeded && mt.brushesNeeded.length > 0) {
+                  <div class="bg-cf-surface rounded-sm p-5 mb-5 border border-gold-subtle">
+                    <h3 class="font-display text-cf-parchment font-bold text-xl mb-3">Pinceles necesarios</h3>
+                    <div class="overflow-x-auto">
+                      <table class="w-full text-sm">
+                        <thead>
+                          <tr class="text-cf-parchment-muted text-xs uppercase tracking-widest border-b border-gold-subtle"><th class="text-left py-2">Tamaño</th><th class="text-left py-2">Tipo</th><th class="text-left py-2">Propósito</th><th class="text-left py-2">Marca recomendada</th></tr>
+                        </thead>
+                        <tbody class="text-cf-parchment-dim text-sm">
+                          @for (brush of mt.brushesNeeded; track brush.size + brush.type) {
+                            <tr class="border-t border-gold-subtle"><td class="py-2">{{ brush.size }}</td><td class="py-2">{{ brush.type }}</td><td class="py-2">{{ brush.purpose }}</td><td class="py-2">{{ brush.recommendedBrand }}</td></tr>
+                          }
+                        </tbody>
+                      </table>
+                    </div>
+                  </div>
+                }
+
+                <!-- Materiales adicionales -->
+                @if (mt.additionalMaterials && mt.additionalMaterials.length > 0) {
+                  <div class="bg-cf-surface rounded-sm p-5 mb-5 border border-gold-subtle">
+                    <h3 class="font-display text-cf-parchment font-bold text-xl mb-3">Materiales adicionales</h3>
+                    <div class="overflow-x-auto">
+                      <table class="w-full text-sm">
+                        <thead>
+                          <tr class="text-cf-parchment-muted text-xs uppercase tracking-widest border-b border-gold-subtle"><th class="text-left py-2">Material</th><th class="text-left py-2">Propósito</th><th class="text-left py-2">Producto recomendado</th></tr>
+                        </thead>
+                        <tbody class="text-cf-parchment-dim text-sm">
+                          @for (mat of mt.additionalMaterials; track mat.material) {
+                            <tr class="border-t border-gold-subtle"><td class="py-2">{{ mat.material }}</td><td class="py-2">{{ mat.purpose }}</td><td class="py-2">{{ mat.recommendedProduct }}</td></tr>
+                          }
+                        </tbody>
+                      </table>
+                    </div>
+                  </div>
+                }
+              } @else {
+                <p class="flex items-center justify-center min-h-[60vh] text-cf-parchment-muted font-display text-lg">No hay información de materiales disponible.</p>
+              }
+            </section>
+          } @placeholder {
+            <div class="text-cf-parchment-muted text-sm">Preparando lista de materiales...</div>
+          } @loading {
+            <div class="flex items-center gap-2 text-cf-parchment-muted"><div class="w-4 h-4 rounded-full border-2 border-gold-subtle border-t-cf-gold animate-spin"></div></div>
+          }
+        }
+
+      </div>
+    }
+
+  </section>
+</app-page-wrapper>
+
+<!-- ======= MODAL: Publicar en galería ======= -->
+@if (showModal()) {
+  <div class="fixed inset-0 bg-black/70 flex items-center justify-center p-4 z-50" (click)="closeModal()">
+    <div class="bg-cf-surface2 rounded-sm p-5 w-full max-w-xl border border-gold-subtle" (click)="$event.stopPropagation()">
+      <h2 class="font-display text-cf-parchment font-bold text-xl">Publicar en galería</h2>
+      <p class="text-cf-parchment-muted text-sm mt-2">Añade una descripción para que la comunidad conozca tu miniatura.</p>
+
+      <form [formGroup]="publishForm" (ngSubmit)="publish()">
+        <textarea
+          formControlName="description"
+          class="w-full bg-cf-surface border border-gold-subtle rounded-sm px-4 py-3 text-cf-parchment placeholder-cf-parchment-muted text-sm focus:border-cf-gold focus:outline-none mt-4"
+          placeholder="Describe tu miniatura, la facción, técnicas usadas..."
+          rows="4"
+        ></textarea>
+
+        @if (publishForm.get('description')!.invalid && publishForm.get('description')!.touched) {
+          <p class="text-cf-crimson-light text-xs mt-2">La descripción debe tener al menos 5 caracteres.</p>
+        }
+
+        @if (publishError()) {
+          <div class="rounded-sm border border-cf-crimson bg-cf-surface p-3 text-cf-crimson-light text-sm mt-2">{{ publishError() }}</div>
+        }
+
+        @if (publishSuccess()) {
+          <div class="rounded-sm border border-cf-gold bg-cf-surface p-3 text-cf-gold text-sm mt-2">¡Publicado! Redirigiendo a la galería...</div>
+        }
+
+        <div class="flex justify-end gap-3 mt-4">
+          <button type="button" class="border border-gold-subtle text-cf-parchment-dim px-4 py-2 rounded-sm hover:border-cf-gold transition-colors text-sm" (click)="closeModal()">Cancelar</button>
+          <button type="submit" class="bg-gradient-to-br from-cf-gold to-cf-gold-dim text-cf-black font-heading rounded-sm px-6 py-3 hover:shadow-gold-lg transition-all uppercase text-[0.75rem] tracking-widest" [disabled]="publishLoading()">
+            @if (publishLoading()) { Publicando... } @else { Publicar }
+          </button>
+        </div>
+      </form>
+    </div>
+  </div>
+}

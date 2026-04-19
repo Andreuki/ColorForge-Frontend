@@ -1,0 +1,54 @@
+<app-page-wrapper>
+  <section class="mx-auto max-w-6xl px-6 py-6">
+    <app-section-title
+      title="Retos de Pintura"
+      subtitle="Compite en campañas temáticas y demuestra tu mejor técnica"
+    />
+
+    <div class="flex gap-2 mb-8 border-b border-gold-subtle">
+      <button
+        (click)="setTab('active')"
+        class="font-heading text-[0.72rem] tracking-widest-cf uppercase px-4 py-2 border-b-2 transition"
+        [class.border-cf-gold]="activeTab() === 'active'"
+        [class.text-cf-gold]="activeTab() === 'active'"
+        [class.border-transparent]="activeTab() !== 'active'"
+        [class.text-cf-parchment-dim]="activeTab() !== 'active'"
+      >
+        Activos
+      </button>
+      <button
+        (click)="setTab('past')"
+        class="font-heading text-[0.72rem] tracking-widest-cf uppercase px-4 py-2 border-b-2 transition"
+        [class.border-cf-gold]="activeTab() === 'past'"
+        [class.text-cf-gold]="activeTab() === 'past'"
+        [class.border-transparent]="activeTab() !== 'past'"
+        [class.text-cf-parchment-dim]="activeTab() !== 'past'"
+      >
+        Pasados
+      </button>
+    </div>
+
+    <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+      @for (challenge of challenges(); track challenge._id) {
+        <a
+          [routerLink]="['/challenges', challenge._id]"
+          class="group border border-gold-subtle bg-cf-surface2 rounded-sm overflow-hidden shadow-card hover:border-gold-hover transition-all duration-200"
+        >
+          @if (challenge.imageUrl) {
+            <img [src]="toAbsoluteUrl(challenge.imageUrl)" class="w-full h-44 object-cover group-hover:scale-105 transition-transform duration-500" alt="Reto" />
+          }
+          <div class="p-5 text-left">
+            <h3 class="font-heading text-xl tracking-wide text-cf-parchment">{{ challenge.title }}</h3>
+            <p class="font-body text-cf-parchment-dim text-base mt-2 line-clamp-2">{{ challenge.description }}</p>
+            <div class="flex justify-between items-center mt-4 font-ui text-[0.75rem] tracking-wide-cf uppercase text-cf-parchment-muted">
+              <span>{{ challenge.startDate | date:'dd/MM/yyyy' }} - {{ challenge.endDate | date:'dd/MM/yyyy' }}</span>
+              @if (!challenge.isActive && challenge.winnerId) {
+                <span class="text-cf-gold">{{ challenge.winnerId.username }}</span>
+              }
+            </div>
+          </div>
+        </a>
+      }
+    </div>
+  </section>
+</app-page-wrapper>

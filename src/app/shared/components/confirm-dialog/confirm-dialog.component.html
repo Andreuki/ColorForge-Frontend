@@ -1,0 +1,27 @@
+@if (open()) {
+  <div class="fixed inset-0 z-[80] flex items-center justify-center bg-cf-black/70 p-4" (click)="onCancel()">
+    <div
+      class="w-full max-w-md border border-gold-subtle bg-cf-surface p-6 shadow-card"
+      (click)="$event.stopPropagation()"
+    >
+      <h3 class="font-heading text-xl font-bold tracking-wide-cf text-cf-gold">{{ title() }}</h3>
+      <p class="mt-3 font-body text-base text-cf-parchment-dim">{{ message() }}</p>
+      <div class="mt-6 flex gap-3">
+        <button
+          type="button"
+          class="w-full rounded-sm border border-gold-subtle bg-cf-surface2 px-4 py-2 font-ui text-sm uppercase tracking-wide-cf text-cf-parchment hover:border-cf-gold"
+          (click)="onCancel()"
+        >
+          Cancelar
+        </button>
+        <button
+          type="button"
+          class="w-full rounded-sm border border-cf-gold bg-cf-gold px-4 py-2 font-ui text-sm uppercase tracking-wide-cf text-cf-black hover:bg-cf-gold-light"
+          (click)="onConfirm()"
+        >
+          Confirmar
+        </button>
+      </div>
+    </div>
+  </div>
+}

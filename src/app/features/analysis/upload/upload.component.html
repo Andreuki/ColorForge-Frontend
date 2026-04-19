@@ -1,0 +1,44 @@
+<app-page-wrapper>
+  <section class="mx-auto max-w-4xl px-6 py-6">
+    <app-section-title title="Analiza Tu Miniatura" subtitle="Sube una imagen y recibe guía técnica de pintura" />
+
+    <div class="bg-cf-surface2 border border-gold-subtle rounded-sm p-6 md:p-8">
+      @if (!selectedFile()) {
+        <div
+          class="border-2 border-dashed border-[rgba(200,146,42,0.3)] rounded-sm bg-cf-surface p-10 text-center hover:border-cf-gold hover:bg-cf-surface2 transition-all duration-200 font-body italic text-cf-parchment-dim"
+          (dragover)="onDragOver($event)"
+          (dragleave)="onDragLeave()"
+          (drop)="onDrop($event)"
+        >
+          <p>Arrastra tu imagen aquí o usa el selector.</p>
+          <label for="fileInput" class="mt-4 inline-block border border-[rgba(200,146,42,0.3)] text-cf-parchment-dim font-heading text-[0.72rem] tracking-widest-cf uppercase px-6 py-3 rounded-sm hover:border-cf-gold hover:text-cf-gold transition-all duration-200 cursor-pointer">Seleccionar imagen</label>
+          <input id="fileInput" type="file" accept="image/jpeg,image/png,image/webp" class="hidden" (change)="onFileSelected($event)" />
+          <p class="mt-3 font-ui text-[0.72rem] tracking-wide-cf uppercase text-cf-parchment-muted">JPEG · PNG · WEBP · 5MB</p>
+        </div>
+      } @else {
+        <div class="bg-cf-surface border border-gold-subtle rounded-sm p-4 mb-6">
+          <img [src]="previewUrl()" alt="Preview" class="w-full rounded-sm object-cover max-h-[420px]" />
+          <div class="flex items-center justify-between mt-3">
+            <span class="font-ui text-[0.75rem] tracking-wide-cf uppercase text-cf-parchment-muted">{{ selectedFile()!.name }}</span>
+            <button class="border border-[rgba(200,146,42,0.3)] text-cf-parchment-dim font-heading text-[0.72rem] tracking-widest-cf uppercase px-6 py-3 rounded-sm hover:border-cf-gold hover:text-cf-gold active:scale-95 transition-all duration-200" (click)="clearSelection()">Cambiar imagen</button>
+          </div>
+        </div>
+      }
+
+      @if (errorMessage()) {
+        <div class="border border-cf-crimson bg-cf-surface p-4 text-cf-parchment mb-4">{{ errorMessage() }}</div>
+      }
+
+      @if (loading()) {
+        <div class="flex flex-col items-center justify-center py-10 gap-3">
+          <div class="w-8 h-8 border-2 border-cf-steel border-t-cf-gold rounded-full animate-spin"></div>
+          <p class="font-body italic text-cf-parchment-dim">Analizando miniatura...</p>
+        </div>
+      } @else if (selectedFile()) {
+        <button class="bg-gradient-to-br from-cf-gold to-cf-gold-dim text-cf-black font-heading text-[0.75rem] tracking-widest-cf uppercase px-6 py-3 rounded-sm shadow-gold-md hover:-translate-y-0.5 hover:shadow-gold-lg active:scale-95 transition-all duration-200 mx-auto block" (click)="upload()">
+          Analizar Miniatura
+        </button>
+      }
+    </div>
+  </section>
+</app-page-wrapper>

@@ -1,0 +1,43 @@
+<app-page-wrapper>
+  <section class="mx-auto max-w-5xl px-6 py-6">
+    <app-section-title
+      title="Forja de Leyendas"
+      subtitle="Clasificación de maestros pintores de la comunidad"
+    />
+
+    <div class="w-full overflow-x-auto border border-gold-subtle bg-cf-surface2 rounded-sm shadow-card">
+      <table class="w-full border-collapse font-ui text-sm">
+        <thead class="border-b border-gold-subtle">
+          <tr>
+            <th class="px-4 py-3 text-left font-heading text-[0.68rem] tracking-widest-cf uppercase text-cf-gold">Rango</th>
+            <th class="px-4 py-3 text-left font-heading text-[0.68rem] tracking-widest-cf uppercase text-cf-gold">Pintor</th>
+            <th class="px-4 py-3 text-left font-heading text-[0.68rem] tracking-widest-cf uppercase text-cf-gold">Nivel</th>
+          </tr>
+        </thead>
+        <tbody>
+          @for (user of users(); track user._id; let i = $index) {
+            <tr
+              [routerLink]="['/profile', user._id]"
+              class="cursor-pointer border-b border-[rgba(200,146,42,0.08)] hover:bg-cf-surface3 transition-colors duration-150"
+            >
+              <td class="px-4 py-3 font-heading text-[0.95rem] tracking-wide">
+                <span [class.text-cf-gold]="i === 0" [class.text-cf-steel-light]="i === 1" [class.text-[#8B6914]]="i === 2" [class.text-cf-parchment-dim]="i > 2">
+                  #{{ i + 1 }}
+                </span>
+              </td>
+              <td class="px-4 py-3 text-cf-parchment-dim font-ui text-[0.85rem] tracking-wide">
+                <div class="flex items-center gap-3">
+                  <img [src]="toAbsoluteUrl(user.avatar)" class="h-10 w-10 rounded-full border-2 border-cf-gold object-cover" alt="Avatar" />
+                  <span class="font-heading text-cf-parchment">{{ user.username }}</span>
+                </div>
+              </td>
+              <td class="px-4 py-3 text-cf-parchment-dim">
+                <app-forge-badge [tierName]="user.forgeTier" [score]="user.forgeScore" [showScore]="true" />
+              </td>
+            </tr>
+          }
+        </tbody>
+      </table>
+    </div>
+  </section>
+</app-page-wrapper>

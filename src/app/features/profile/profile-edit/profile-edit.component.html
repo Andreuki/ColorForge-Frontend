@@ -1,0 +1,165 @@
+<section class="mx-auto min-h-screen max-w-3xl bg-[#0d0d0d] px-8 py-10 text-[#F0EDE4]">
+  <div class="rounded-lg bg-[#1a1a1a] p-6 shadow-md">
+    <form
+      id="edit-profile-form"
+      class="pt-4"
+      [formGroup]="profileForm"
+      (submit)="saveProfile($event)"
+      [class.hidden]="activeSection() !== 'profile'"
+    >
+      <h3 class="mb-6 text-xl font-bold text-[#C8922A]">Edit Profile</h3>
+      <div class="space-y-6">
+        <div>
+          <label for="name" class="mb-2 block font-bold text-[#F0EDE4]">Full name</label>
+          <input
+            type="text"
+            id="name"
+            formControlName="nameUser"
+            class="w-full rounded-lg border border-[#2a2a1a] bg-[#111] px-3 py-2 text-[#F0EDE4] focus:outline-none focus:ring-2 focus:ring-[#C8922A]"
+          />
+          @if (profileForm.controls.nameUser.invalid && (profileForm.controls.nameUser.touched || profileForm.controls.nameUser.dirty)) {
+            <div class="mt-1 text-sm text-red-400">Name user cannot be empty</div>
+          }
+        </div>
+        <div>
+          <label for="email" class="mb-2 block font-bold text-[#F0EDE4]">Email</label>
+          <input
+            type="email"
+            id="email"
+            formControlName="email"
+            class="w-full rounded-lg border border-[#2a2a1a] bg-[#111] px-3 py-2 text-[#F0EDE4] focus:outline-none focus:ring-2 focus:ring-[#C8922A]"
+          />
+          @if (profileForm.controls.email.invalid && (profileForm.controls.email.touched || profileForm.controls.email.dirty)) {
+            <div class="mt-1 text-sm text-red-400">Email must have the right format</div>
+          }
+        </div>
+      </div>
+      <div class="mt-8 flex gap-4">
+        <button
+          type="submit"
+          [disabled]="profileForm.invalid"
+          class="w-full rounded-lg bg-[#C8922A] px-4 py-2 font-bold text-black hover:bg-[#E8A830] disabled:cursor-not-allowed disabled:opacity-60"
+        >
+          Save Changes
+        </button>
+        <button
+          type="button"
+          [routerLink]="['/profile']"
+          class="w-full rounded-lg bg-[#2a2a1a] px-4 py-2 font-bold text-[#F0EDE4] hover:bg-[#343424]"
+        >
+          Cancel
+        </button>
+      </div>
+
+      <div class="mt-12 border border-red-800 rounded-xl p-6">
+        <h3 class="text-red-400 font-bold text-lg mb-2" style="font-family: var(--font-heading)">
+          ⚠ Zona de Peligro
+        </h3>
+        <p class="text-gray-400 text-sm mb-4">
+          Una vez eliminada tu cuenta, tus datos personales seran borrados permanentemente.
+          Tus publicaciones y analisis se conservaran como anonimos en la comunidad.
+        </p>
+        <button
+          type="button"
+          (click)="confirmDeleteAccount()"
+          class="px-4 py-2 border border-red-600 text-red-400 rounded-lg text-sm font-bold hover:bg-red-900 transition"
+        >
+          Eliminar mi cuenta
+        </button>
+      </div>
+    </form>
+
+    <form
+      id="change-password-form"
+      class="pt-4"
+      [formGroup]="passwordForm"
+      (submit)="savePassword($event)"
+      [class.hidden]="activeSection() !== 'password'"
+    >
+      <h3 class="mb-6 text-xl font-bold text-[#C8922A]">Change Password</h3>
+      <div class="space-y-6">
+        <div>
+          <label for="new-password" class="mb-2 block font-bold text-[#F0EDE4]">New Password</label>
+          <input
+            type="password"
+            id="new-password"
+            formControlName="password"
+            class="w-full rounded-lg border border-[#2a2a1a] bg-[#111] px-3 py-2 text-[#F0EDE4] focus:outline-none focus:ring-2 focus:ring-[#C8922A]"
+          />
+          @if (passwordForm.controls.password.invalid && (passwordForm.controls.password.touched || passwordForm.controls.password.dirty)) {
+            <div class="mt-1 text-sm text-red-400">The password must be at least 4 characters long</div>
+          }
+        </div>
+        <div>
+          <label for="confirm-new-password" class="mb-2 block font-bold text-[#F0EDE4]">Repeat Password</label>
+          <input
+            type="password"
+            id="confirm-new-password"
+            formControlName="passwordConfirm"
+            class="w-full rounded-lg border border-[#2a2a1a] bg-[#111] px-3 py-2 text-[#F0EDE4] focus:outline-none focus:ring-2 focus:ring-[#C8922A]"
+          />
+          @if (passwordForm.controls.passwordConfirm.invalid && (passwordForm.controls.passwordConfirm.touched || passwordForm.controls.passwordConfirm.dirty)) {
+            <div class="mt-1 text-sm text-red-400">The password must be at least 4 characters long</div>
+          }
+          @if (passwordForm.errors?.['samePassword']) {
+            <div class="mt-1 text-sm text-red-400">Passwords are not equal</div>
+          }
+        </div>
+      </div>
+      <div class="mt-8 flex gap-4">
+        <button
+          type="submit"
+          [disabled]="passwordForm.invalid"
+          class="w-full rounded-lg bg-[#C8922A] px-4 py-2 font-bold text-black hover:bg-[#E8A830] disabled:cursor-not-allowed disabled:opacity-60"
+        >
+          Save Changes
+        </button>
+        <button
+          type="button"
+          [routerLink]="['/profile']"
+          class="w-full rounded-lg bg-[#2a2a1a] px-4 py-2 font-bold text-[#F0EDE4] hover:bg-[#343424]"
+        >
+          Cancel
+        </button>
+      </div>
+    </form>
+
+    @if (showDeleteConfirm()) {
+      <div class="fixed inset-0 bg-black bg-opacity-80 z-50 flex items-center justify-center">
+        <div class="bg-gray-900 border border-red-700 rounded-xl p-8 max-w-sm w-full mx-4">
+          <h3 class="text-2xl font-bold text-red-400 mb-3" style="font-family: var(--font-heading)">
+            ¿Eliminar tu cuenta?
+          </h3>
+          <p class="text-gray-300 text-sm mb-2">
+            Esta accion <strong>no se puede deshacer</strong>. Se eliminaran:
+          </p>
+          <ul class="text-gray-400 text-sm list-disc list-inside mb-6 space-y-1">
+            <li>Tus datos personales (nombre, email, avatar)</li>
+            <li>Tu historial de seguidores</li>
+            <li>Tus notificaciones</li>
+          </ul>
+          <p class="text-gray-400 text-sm mb-6">
+            Tus publicaciones y analisis permaneceran como <em>"[Cuenta eliminada]"</em>.
+          </p>
+          <div class="flex gap-3">
+            <button
+              type="button"
+              (click)="deleteAccount()"
+              [disabled]="deleting()"
+              class="flex-1 bg-red-700 hover:bg-red-600 disabled:opacity-50 font-bold py-2 rounded-lg transition text-sm"
+            >
+              {{ deleting() ? 'Eliminando...' : 'Si, eliminar' }}
+            </button>
+            <button
+              type="button"
+              (click)="cancelDeleteAccount()"
+              class="flex-1 bg-gray-700 hover:bg-gray-600 font-bold py-2 rounded-lg transition text-sm"
+            >
+              Cancelar
+            </button>
+          </div>
+        </div>
+      </div>
+    }
+  </div>
+</section>

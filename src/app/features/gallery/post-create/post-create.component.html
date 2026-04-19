@@ -1,0 +1,137 @@
+<app-page-wrapper>
+  <section class="mx-auto max-w-4xl px-6 py-8">
+    <app-section-title 
+      [title]="isEditMode() ? 'Editar publicación' : 'Nueva publicación'" 
+      subtitle="Comparte tu arte con la comunidad" 
+    />
+
+    <div class="rounded-sm bg-cf-surface2 p-6 border border-gold-subtle space-y-5">
+
+      <div>
+        <label class="block text-sm text-cf-parchment-muted mb-2 font-heading uppercase tracking-widest">Título *</label>
+        <input
+          type="text"
+          [value]="title()"
+          (input)="title.set($any($event.target).value)"
+          maxlength="120"
+          class="w-full rounded-sm bg-cf-surface border border-gold-subtle px-4 py-2 text-cf-parchment focus:outline-none focus:border-cf-gold focus:ring-2 focus:ring-[rgba(200,146,42,0.1)]"
+        />
+      </div>
+
+      <div>
+        <label class="block text-sm text-cf-parchment-muted mb-2 font-heading uppercase tracking-widest">Descripción</label>
+        <textarea
+          rows="4"
+          [value]="description()"
+          (input)="description.set($any($event.target).value)"
+          class="w-full rounded-sm bg-cf-surface border border-gold-subtle px-4 py-3 text-cf-parchment focus:outline-none focus:border-cf-gold focus:ring-2 focus:ring-[rgba(200,146,42,0.1)]"
+        ></textarea>
+      </div>
+
+      <div>
+        <label class="block text-sm text-cf-parchment-muted mb-2 font-heading uppercase tracking-widest">Imágenes (máx. 10)</label>
+        <input type="file" accept="image/*" multiple (change)="onImagesSelected($event)" class="w-full text-sm" />
+        @if (imagePreviewUrls().length > 0) {
+          <div class="grid grid-cols-2 md:grid-cols-4 gap-3 mt-3">
+            @for (img of imagePreviewUrls(); track img) {
+              <img [src]="img" class="h-28 w-full rounded-sm object-cover border border-gold-subtle" alt="Preview" />
+            }
+          </div>
+        }
+      </div>
+
+      <div>
+        <label class="block text-sm text-cf-parchment-muted mb-2 font-heading uppercase tracking-widest">Técnicas</label>
+        <div class="flex gap-2">
+          <input
+            type="text"
+            [value]="techniqueInput()"
+            (input)="techniqueInput.set($any($event.target).value)"
+            (keydown.enter)="$event.preventDefault(); addTechnique()"
+            class="flex-1 rounded-sm bg-cf-surface border border-gold-subtle px-4 py-2 text-cf-parchment"
+            placeholder="Ej: Drybrush"
+          />
+          <button type="button" (click)="addTechnique()" class="bg-cf-gold text-cf-black px-4 py-2 rounded-sm font-heading uppercase text-sm">Añadir</button>
+        </div>
+        <div class="flex flex-wrap gap-2 mt-2">
+          @for (tech of techniques(); track tech) {
+            <button type="button" (click)="removeTechnique(tech)" class="px-3 py-1 bg-cf-surface2 rounded-sm text-sm font-ui border border-gold-subtle">{{ tech }} ×</button>
+          }
+        </div>
+      </div>
+
+      <div>
+        <label class="block text-sm text-cf-parchment-muted mb-2 font-heading uppercase tracking-widest">Colores</label>
+        <div class="flex gap-2 items-center">
+          <input type="color" [value]="colorInput()" (input)="colorInput.set($any($event.target).value)" class="h-10 w-12 rounded-sm border border-gold-subtle" />
+          <input
+            type="text"
+            [value]="colorInput()"
+            (input)="colorInput.set($any($event.target).value)"
+            placeholder="#FFFFFF"
+            class="rounded-sm bg-cf-surface border border-gold-subtle px-4 py-2 text-cf-parchment"
+          />
+          <button type="button" (click)="addColor()" class="bg-cf-gold text-cf-black px-4 py-2 rounded-sm font-heading uppercase text-sm">Añadir</button>
+        </div>
+        <div class="flex flex-wrap gap-2 mt-2">
+          @for (color of colors(); track color) {
+            <button type="button" (click)="removeColor(color)" class="flex items-center gap-2 px-3 py-1 bg-cf-surface2 rounded-sm text-sm font-ui border border-gold-subtle">
+              <span class="w-4 h-4 rounded-full border border-cf-steel" [style.background-color]="color"></span>
+              {{ color }} ×
+            </button>
+          }
+        </div>
+      </div>
+
+      <div class="grid gap-4 md:grid-cols-2">
+        <div>
+          <label class="block text-sm text-cf-parchment-muted mb-2 font-heading uppercase tracking-widest">Privacidad</label>
+          <select
+            [value]="privacy()"
+            (change)="privacy.set($any($event.target).value)"
+            class="w-full rounded-sm bg-cf-surface border border-gold-subtle px-4 py-2 text-cf-parchment font-ui"
+          >
+            <option value="public">Público</option>
+            <option value="followers">Solo seguidores</option>
+            <option value="private">Privado</option>
+          </select>
+        </div>
+
+        <div>
+          <label class="block text-sm text-cf-parchment-muted mb-2 font-heading uppercase tracking-widest">Facción</label>
+          <input
+            type="text"
+            [value]="faction()"
+            (input)="faction.set($any($event.target).value)"
+            class="w-full rounded-sm bg-cf-surface border border-gold-subtle px-4 py-2 text-cf-parchment font-ui"
+          />
+        </div>
+      </div>
+
+      @if (activeChallenge()) {
+        <div class="flex items-center gap-3 p-4 bg-cf-surface border border-cf-gold rounded-sm">
+          <input
+            type="checkbox"
+            id="joinChallenge"
+            (change)="joinChallenge.set($any($event.target).checked)"
+            class="w-4 h-4 accent-cf-gold"
+          />
+          <label for="joinChallenge" class="text-sm text-cf-parchment cursor-pointer">
+            Participar en el reto: <strong>{{ activeChallenge().title }}</strong>
+          </label>
+        </div>
+      }
+
+      @if (error()) {
+        <div class="rounded-sm border border-cf-crimson bg-cf-surface p-3 text-cf-crimson-light text-sm">{{ error() }}</div>
+      }
+
+      <div class="flex justify-end gap-3 pt-2">
+        <a routerLink="/gallery" class="border border-gold-subtle text-cf-parchment-dim px-4 py-2 rounded-sm font-heading uppercase text-sm hover:border-cf-gold">Cancelar</a>
+        <button (click)="submitPost()" [disabled]="loading()" class="bg-gradient-to-br from-cf-gold to-cf-gold-dim text-cf-black font-heading rounded-sm px-6 py-2 hover:shadow-gold-lg uppercase text-sm tracking-widest">
+          @if (loading()) { Guardando... } @else if (isEditMode()) { Guardar cambios } @else { Publicar }
+        </button>
+      </div>
+    </div>
+  </section>
+</app-page-wrapper>

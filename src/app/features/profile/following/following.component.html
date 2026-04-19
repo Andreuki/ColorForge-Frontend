@@ -1,0 +1,22 @@
+<section class="mx-auto min-h-screen max-w-4xl px-6 py-10 text-[#F0EDE4] bg-[#0d0d0d]">
+  <div class="rounded-xl bg-[#1a1a1a] border border-[#2a2a1a] p-6">
+    <h1 class="text-2xl font-bold text-[#C8922A] mb-4" style="font-family: var(--font-heading)">Siguiendo</h1>
+
+    @if (loading()) {
+      <p class="text-[#8A8070]">Cargando seguidos...</p>
+    } @else if (error()) {
+      <p class="text-red-300">{{ error() }}</p>
+    } @else if (following().length === 0) {
+      <p class="text-[#8A8070]">Este usuario aún no sigue a nadie.</p>
+    } @else {
+      <div class="grid grid-cols-1 sm:grid-cols-2 gap-3">
+        @for (user of following(); track user._id) {
+          <a [routerLink]="['/user', user._id]" class="flex items-center gap-3 rounded-lg bg-[#111] border border-[#2a2a1a] p-3 hover:border-[#C8922A] transition-colors">
+            <img [src]="toAbsoluteUrl(user.avatar)" class="h-10 w-10 rounded-full object-cover" [alt]="user.username || user.name" />
+            <span class="font-semibold">{{ user.username || user.name }}</span>
+          </a>
+        }
+      </div>
+    }
+  </div>
+</section>

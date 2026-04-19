@@ -1,0 +1,177 @@
+<app-page-wrapper>
+  <section class="mx-auto max-w-5xl px-6 py-6">
+    <app-section-title title="Perfil" subtitle="Gestiona tu cuenta y publicaciones" />
+
+    <div class="rounded-sm bg-cf-surface2 p-6 shadow-md border border-gold-subtle">
+      @if (profileResource.isLoading()) {
+        <div class="text-center py-20">
+          <p class="text-[#b8960c] font-serif italic">
+            Cargando perfil...
+          </p>
+        </div>
+      } @else if (!user()) {
+        <div class="text-center py-20">
+          <p class="text-[#b8960c] font-serif italic">
+            No se pudo cargar el perfil
+          </p>
+        </div>
+      } @else {
+      <div class="flex flex-col items-center gap-6 md:flex-row md:items-start md:justify-between">
+        <div class="flex flex-col items-center gap-4 md:flex-row md:items-center">
+          <div class="group relative">
+            <img
+              [src]="resolvedAvatar()"
+              [alt]="displayName()"
+              class="h-32 w-32 rounded-full border-2 border-gold-subtle object-cover"
+            />
+            @if (isMyProfile()) {
+              <button
+                type="button"
+                class="absolute inset-0 flex items-center justify-center rounded-full bg-black/60 text-sm font-heading uppercase tracking-widest text-cf-parchment opacity-0 transition-opacity group-hover:opacity-100"
+                (click)="triggerAvatarInput(avatarInput)"
+              >
+                Cambiar
+              </button>
+              <input
+                #avatarInput
+                type="file"
+                class="hidden"
+                accept="image/*"
+                (change)="onAvatarSelected($event)"
+              />
+            }
+          </div>
+
+          <div>
+            <h1 class="font-display text-3xl font-bold text-cf-gold">{{ displayName() }}</h1>
+            <p class="mt-2 text-sm text-cf-parchment-muted">{{ userEmail() }}</p>
+            <div class="mt-3 flex items-center gap-3 text-sm">
+              <a
+                [routerLink]="['/user', id() ?? user()?._id, 'followers']"
+                class="text-cf-gold hover:text-cf-gold-light transition-colors"
+              >
+                Seguidores ({{ user()?.followers?.length ?? 0 }})
+              </a>
+              <a
+                [routerLink]="['/user', id() ?? user()?._id, 'following']"
+                class="text-cf-gold hover:text-cf-gold-light transition-colors"
+              >
+                Siguiendo ({{ user()?.following?.length ?? 0 }})
+              </a>
+            </div>
+            <a
+              [routerLink]="['/analyses']"
+              [queryParams]="{ userId: analysesLink() }"
+              class="mt-4 inline-flex text-sm font-heading uppercase tracking-widest text-cf-gold hover:text-cf-gold-light"
+            >
+              Ver análisis del usuario
+            </a>
+
+            @if (user()) {
+              <div class="mt-4 p-4 bg-cf-surface rounded-sm border border-gold-subtle">
+                <app-forge-badge
+                  [tierName]="forgeTier()"
+                  [score]="forgeScore()"
+                  [showScore]="true"
+                  [showProgress]="isMyProfile()"
+                />
+
+                @if (badges().length) {
+                  <div class="mt-3 flex flex-wrap gap-2">
+                    @for (badge of badges(); track badge) {
+                      <span
+                        class="px-2 py-1 bg-cf-surface2 border border-cf-gold text-cf-gold text-xs rounded-sm font-heading uppercase tracking-widest"
+                      >
+                        {{ badge }}
+                      </span>
+                    }
+                  </div>
+                }
+              </div>
+            }
+          </div>
+        </div>
+
+        @if (isMyProfile()) {
+          <div class="flex w-full flex-col gap-3 md:w-auto">
+            <button
+              type="button"
+              class="rounded-sm bg-cf-gold px-4 py-2 text-sm font-heading uppercase tracking-widest text-cf-black hover:bg-cf-gold-light"
+              (click)="openEdit('profile')"
+            >
+              Editar perfil
+            </button>
+              <button
+              type="button"
+              class="rounded-sm bg-cf-surface px-4 py-2 text-sm font-heading uppercase tracking-widest text-cf-parchment hover:border-cf-gold border border-gold-subtle"
+              (click)="openEdit('password')"
+            >
+              Cambiar contraseña
+            </button>
+          </div>
+        }
+      </div>
+
+      @if (user()) {
+        <div class="mt-8">
+          <h2 class="font-heading text-2xl font-bold mb-4 uppercase tracking-widest text-cf-parchment">
+            Publicaciones ({{ userPosts().length }})
+          </h2>
+
+          @if (userPostsResource.isLoading()) {
+            <p class="text-cf-parchment-muted">Cargando publicaciones...</p>
+          } @else if (userPostsState().length === 0) {
+            <p class="text-cf-parchment-muted">Este usuario no tiene publicaciones.</p>
+          } @else {
+            <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
+              @for (post of userPostsState(); track post._id) {
+                <div
+                    [routerLink]="['/posts', post._id]"
+                  class="cursor-pointer rounded-sm overflow-hidden bg-cf-surface2 hover:ring-2 hover:ring-cf-gold transition group border border-gold-subtle"
+                >
+                  <div class="relative h-48 overflow-hidden">
+                    <img
+                      [src]="postPreviewImage(post)"
+                      class="w-full h-full object-cover group-hover:scale-105 transition-transform duration-300"
+                      [alt]="post.title || 'Post'"
+                    />
+                    @if (canDeletePost(post)) {
+                      <button
+                        type="button"
+                        class="absolute top-2 right-2 rounded-sm bg-cf-black/70 px-2 py-1 text-xs text-cf-crimson-light hover:bg-cf-surface"
+                        (click)="askDeletePost(post, $event)"
+                      >
+                        Eliminar
+                      </button>
+                    }
+                  </div>
+                  <div class="p-3">
+                      <p class="font-heading uppercase tracking-widest truncate text-cf-parchment">
+                      {{ post.title || 'Sin título' }}
+                    </p>
+                    @if (post.ratings.length) {
+                      <div class="flex items-center gap-1 text-sm text-cf-gold mt-1">
+                        <span>★</span>
+                        <span>{{ avgRating(post) | number:'1.1-1' }}</span>
+                        <span class="text-cf-parchment-muted">({{ post.ratings.length }})</span>
+                      </div>
+                    }
+                  </div>
+                </div>
+              }
+            </div>
+          }
+        </div>
+      }
+      }
+
+      <app-confirm-dialog
+        [open]="deleteDialogOpen()"
+        title="Eliminar publicaci�n"
+        message="Esta publicaci�n se eliminar� de forma permanente."
+        (confirmed)="confirmDeletePost()"
+        (cancelled)="cancelDeletePost()"
+      />
+    </div>
+  </section>
+</app-page-wrapper>

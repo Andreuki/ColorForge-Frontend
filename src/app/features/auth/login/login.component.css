@@ -1,0 +1,166 @@
+/* =========================================================
+   Auth pages — estilos compartidos para login y register
+   ========================================================= */
+
+.auth-page {
+  min-height: calc(100vh - 64px);
+  background: radial-gradient(ellipse at top, #1a1a2e 0%, #0f0f0f 60%);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 2rem 1rem;
+}
+
+.auth-card {
+  background: #16213e;
+  border: 1px solid rgba(255, 255, 255, 0.08);
+  border-radius: 12px;
+  padding: 2.5rem 2rem;
+  width: 100%;
+  max-width: 420px;
+  box-shadow: 0 8px 32px rgba(0, 0, 0, 0.5);
+}
+
+/* Logo dentro del card */
+.auth-logo {
+  text-align: center;
+  margin-bottom: 1.5rem;
+}
+
+.logo-icon {
+  font-size: 2.5rem;
+  display: block;
+  margin-bottom: 0.25rem;
+}
+
+.logo-title {
+  font-family: 'Cinzel', serif;
+  font-size: 1.8rem;
+  font-weight: 700;
+  color: #e07b39;
+  margin: 0;
+}
+
+.logo-subtitle {
+  font-family: 'Rajdhani', sans-serif;
+  color: #9ca3af;
+  font-size: 0.9rem;
+  margin: 0.25rem 0 0;
+}
+
+/* Encabezado del formulario */
+.auth-heading {
+  font-family: 'Cinzel', serif;
+  font-size: 1.25rem;
+  color: #f0e6d3;
+  margin: 0 0 1.5rem;
+  text-align: center;
+}
+
+/* Formulario */
+.auth-form {
+  display: flex;
+  flex-direction: column;
+  gap: 1.1rem;
+}
+
+.field {
+  display: flex;
+  flex-direction: column;
+  gap: 0.35rem;
+}
+
+.field-label {
+  font-family: 'Rajdhani', sans-serif;
+  font-size: 0.9rem;
+  font-weight: 600;
+  color: #c9a84c;
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
+}
+
+.field-input {
+  background: #0f0f0f;
+  border: 1px solid rgba(255, 255, 255, 0.12);
+  border-radius: 6px;
+  color: #f0e6d3;
+  font-family: 'Rajdhani', sans-serif;
+  font-size: 1rem;
+  padding: 0.6rem 0.85rem;
+  transition: border-color 0.2s;
+  outline: none;
+}
+
+.field-input::placeholder {
+  color: #4b5563;
+}
+
+.field-input:focus {
+  border-color: #e07b39;
+}
+
+.field-input--error {
+  border-color: #ef4444 !important;
+}
+
+.field-error {
+  font-family: 'Rajdhani', sans-serif;
+  font-size: 0.82rem;
+  color: #ef4444;
+}
+
+/* Alerta de error global */
+.alert-error {
+  background: rgba(239, 68, 68, 0.12);
+  border: 1px solid #ef4444;
+  border-radius: 6px;
+  color: #ef4444;
+  font-family: 'Rajdhani', sans-serif;
+  padding: 0.6rem 0.85rem;
+  font-size: 0.9rem;
+}
+
+/* Botón primario */
+.btn-primary {
+  background: #e07b39;
+  color: #0f0f0f;
+  border: none;
+  border-radius: 6px;
+  padding: 0.7rem;
+  font-family: 'Cinzel', serif;
+  font-size: 0.95rem;
+  font-weight: 700;
+  letter-spacing: 0.05em;
+  cursor: pointer;
+  transition: filter 0.2s, opacity 0.2s;
+  margin-top: 0.5rem;
+}
+
+.btn-primary:hover:not(:disabled) {
+  filter: brightness(1.15);
+}
+
+.btn-primary:disabled {
+  opacity: 0.6;
+  cursor: not-allowed;
+}
+
+/* Footer del card */
+.auth-footer {
+  text-align: center;
+  color: #9ca3af;
+  font-family: 'Rajdhani', sans-serif;
+  margin-top: 1.25rem;
+  font-size: 0.9rem;
+}
+
+.auth-link {
+  color: #e07b39;
+  text-decoration: none;
+  font-weight: 600;
+  transition: color 0.2s;
+}
+
+.auth-link:hover {
+  color: #c9a84c;
+}

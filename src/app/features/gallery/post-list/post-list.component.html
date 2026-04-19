@@ -1,0 +1,205 @@
+<section class="relative z-10 mx-auto min-h-screen max-w-7xl px-6 py-10 text-cf-parchment">
+  <header class="relative pb-10 pt-14 text-center">
+    <div class="flex items-center justify-center gap-4 mb-4">
+      <div class="h-px w-24 bg-gradient-to-r from-transparent to-cf-gold-dim"></div>
+      <span class="text-cf-gold text-xs">◆</span>
+      <div class="h-px w-24 bg-gradient-to-l from-transparent to-cf-gold-dim"></div>
+    </div>
+    <h1 class="font-display text-4xl md:text-5xl lg:text-6xl tracking-widest-cf bg-gradient-to-r from-cf-gold-dim via-cf-gold-light to-cf-gold bg-[length:200%_auto] bg-clip-text text-transparent animate-shimmer">
+      Galería de Miniaturas
+    </h1>
+    <p class="mt-3 text-lg italic font-body text-cf-parchment-dim">
+      Descubre vitrinas de batalla pintadas por la comunidad de ColorForge.
+    </p>
+    <div class="flex items-center justify-center gap-4 mt-4">
+      <div class="h-px w-24 bg-gradient-to-r from-transparent to-cf-gold-dim"></div>
+      <span class="text-cf-gold text-xs">◆</span>
+      <div class="h-px w-24 bg-gradient-to-l from-transparent to-cf-gold-dim"></div>
+    </div>
+  </header>
+
+  @if (activeChallenge()) {
+    <a
+      class="block mb-10 border border-gold-subtle bg-cf-surface2 shadow-card hover:border-gold-hover transition-all duration-300"
+      [routerLink]="['/challenges', activeChallenge()._id]"
+    >
+      <div class="grid grid-cols-1 md:grid-cols-[2fr_3fr]">
+        @if (activeChallenge().imageUrl) {
+          <img [src]="toAbsoluteUrl(activeChallenge().imageUrl)" class="h-48 w-full object-cover md:h-full" alt="Reto activo" />
+        } @else {
+          <div class="h-48 w-full bg-cf-surface3 md:h-full"></div>
+        }
+        <div class="p-5 text-left">
+          <p class="font-ui text-[0.72rem] uppercase tracking-widest-cf text-cf-gold">Reto Activo</p>
+          <h2 class="mt-1 font-heading text-2xl tracking-wide-cf text-cf-parchment">{{ activeChallenge().title }}</h2>
+          <p class="mt-2 font-body text-base text-cf-parchment-dim line-clamp-2">{{ activeChallenge().description }}</p>
+          <p class="mt-3 font-ui text-[0.72rem] uppercase tracking-wide-cf text-cf-parchment-muted">
+            Disponible hasta {{ activeChallenge().endDate | date:'dd/MM/yyyy' }}
+          </p>
+        </div>
+      </div>
+    </a>
+  }
+
+  <div class="flex flex-wrap items-center gap-3 mb-10">
+    <input
+      type="text"
+      placeholder="Buscar miniatura, pintor, técnica..."
+      (input)="searchTerm.set($any($event.target).value)"
+      class="min-w-[220px] rounded-sm border border-gold-subtle bg-cf-surface2 px-4 py-2.5 font-body text-base text-cf-parchment placeholder:font-body placeholder:text-cf-parchment-muted focus:outline-none focus:border-cf-gold focus:ring-2 focus:ring-[rgba(200,146,42,0.1)] transition-all duration-200"
+    />
+
+    <select
+      (change)="sortBy.set($any($event.target).value)"
+      class="rounded-sm border border-gold-subtle bg-cf-surface2 px-4 py-2.5 font-ui text-sm uppercase tracking-wide-cf text-cf-parchment appearance-none cursor-pointer focus:outline-none focus:border-cf-gold transition-all duration-200"
+    >
+      <option value="recent">Más recientes</option>
+      <option value="top">Mejor valorados</option>
+    </select>
+
+    @if (authService.currentUser()) {
+      <button
+        (click)="showSaved.set(!showSaved())"
+        class="rounded-sm border border-cf-crimson px-5 py-2.5 font-heading text-[0.72rem] uppercase tracking-widest-cf text-cf-parchment transition-all duration-200 hover:bg-cf-crimson hover:text-cf-parchment active:scale-95"
+      >
+        Mis Guardados
+      </button>
+    }
+  </div>
+
+  @if (loading()) {
+    <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-7">
+      @for (slot of [1,2,3]; track slot) {
+        <article class="relative overflow-hidden border border-gold-subtle bg-cf-surface2 p-4 shadow-card animate-fade-up">
+          <div class="aspect-[4/3] bg-cf-surface3"></div>
+          <div class="mt-4 space-y-2">
+            <div class="h-3 w-20 bg-cf-steel"></div>
+            <div class="h-4 w-full bg-cf-surface3"></div>
+            <div class="h-4 w-3/4 bg-cf-surface3"></div>
+          </div>
+        </article>
+      }
+    </div>
+  }
+
+  @if (!loading() && errorMessage()) {
+    <div class="border border-cf-crimson bg-cf-surface2 p-4 text-center font-body text-cf-parchment">{{ errorMessage() }}</div>
+  }
+
+  @if (!loading() && !errorMessage()) {
+    @if (filteredPosts().length === 0) {
+      <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-7">
+        @for (slot of [1,2,3]; track slot) {
+          <article class="group relative overflow-hidden border border-gold-subtle bg-cf-surface2 shadow-card">
+            <div class="absolute top-0 left-0 w-3 h-3 border-t border-l border-cf-gold-dim opacity-60 group-hover:opacity-100 transition-opacity"></div>
+            <div class="absolute top-0 right-0 w-3 h-3 border-t border-r border-cf-gold-dim opacity-60 group-hover:opacity-100 transition-opacity"></div>
+            <div class="absolute bottom-0 left-0 w-3 h-3 border-b border-l border-cf-gold-dim opacity-60 group-hover:opacity-100 transition-opacity"></div>
+            <div class="absolute bottom-0 right-0 w-3 h-3 border-b border-r border-cf-gold-dim opacity-60 group-hover:opacity-100 transition-opacity"></div>
+            <div class="relative aspect-[4/3] overflow-hidden">
+              <img src="assets/placeholders/placeholder-1.svg" alt="Miniatura de ejemplo" class="h-full w-full object-cover" />
+            </div>
+            <div class="p-4 space-y-2 text-left">
+              <p class="font-ui text-[0.68rem] uppercase tracking-widest-cf text-cf-gold">CFUSER</p>
+              <h3 class="font-heading text-[0.92rem] tracking-wide text-cf-parchment leading-snug">Tu primera miniatura aparecerá aquí</h3>
+            </div>
+          </article>
+        }
+      </div>
+    } @else {
+      <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-7">
+        @for (post of filteredPosts(); track postId(post); let i = $index) {
+          <article
+            class="group relative overflow-hidden cursor-pointer border border-gold-subtle bg-cf-surface2 hover:-translate-y-1 hover:border-gold-hover hover:shadow-gold-lg transition-all duration-300"
+            [class.animate-fade-up]="i % 3 === 0"
+            [class.animate-fade-up-2]="i % 3 === 1"
+            [class.animate-fade-up-3]="i % 3 === 2"
+            (click)="goToDetail(postId(post))"
+            (keydown.enter)="goToDetail(postId(post))"
+            tabindex="0"
+            role="button"
+          >
+            <div class="absolute top-0 left-0 w-3 h-3 border-t border-l border-cf-gold-dim opacity-60 group-hover:opacity-100 transition-opacity"></div>
+            <div class="absolute top-0 right-0 w-3 h-3 border-t border-r border-cf-gold-dim opacity-60 group-hover:opacity-100 transition-opacity"></div>
+            <div class="absolute bottom-0 left-0 w-3 h-3 border-b border-l border-cf-gold-dim opacity-60 group-hover:opacity-100 transition-opacity"></div>
+            <div class="absolute bottom-0 right-0 w-3 h-3 border-b border-r border-cf-gold-dim opacity-60 group-hover:opacity-100 transition-opacity"></div>
+
+            <div class="relative aspect-[4/3] overflow-hidden">
+              <img
+                [src]="imageUrl(post, i)"
+                [alt]="post.description || 'Miniatura de galeria'"
+                class="h-full w-full object-cover group-hover:scale-105 transition-transform duration-500 ease-out"
+                loading="lazy"
+                (error)="onImageError($event, i)"
+              />
+
+              <span class="absolute top-2.5 left-2.5 w-2 h-2 rounded-full bg-cf-gold shadow-gold-glow"></span>
+
+              @if (canDelete(post)) {
+                <button
+                  type="button"
+                  class="absolute left-2 bottom-2 rounded-sm border border-cf-crimson px-2 py-1 font-ui text-[0.65rem] uppercase tracking-wide-cf text-cf-parchment bg-cf-surface/80 hover:bg-cf-crimson transition-all"
+                  (click)="askDelete(post, $event)"
+                  aria-label="Eliminar post"
+                >
+                  Eliminar
+                </button>
+              }
+            </div>
+
+            <div class="p-4 space-y-2 text-left">
+              @if (authorProfileId(post.userId)) {
+                <a
+                  [routerLink]="['/user', authorProfileId(post.userId)]"
+                  (click)="$event.stopPropagation()"
+                  class="inline-flex font-ui text-[0.68rem] uppercase tracking-widest-cf text-cf-gold hover:text-cf-gold-light transition-colors"
+                >
+                  {{ authorName(post.userId) }}
+                </a>
+              } @else {
+                <p class="font-ui text-[0.68rem] uppercase tracking-widest-cf text-cf-gold">{{ authorName(post.userId) }}</p>
+              }
+              <h3 class="font-heading text-[0.92rem] tracking-wide text-cf-parchment leading-snug group-hover:text-cf-gold-light transition-colors duration-200">
+                {{ post.description || 'Mi primera miniatura...' }}
+              </h3>
+
+              <div class="flex items-center gap-1.5">
+                @for (filled of starsArray(ratingValue(post)); track $index) {
+                  <span [class.text-cf-gold]="filled" [class.text-cf-steel]="!filled" class="text-sm">★</span>
+                }
+                <span class="ml-1 font-ui text-[0.75rem] text-cf-parchment-muted">({{ post.totalRatings ?? post.ratings.length }})</span>
+              </div>
+
+              <div class="flex items-center justify-between border-t border-[rgba(200,146,42,0.1)] pt-2.5 mt-2.5 font-ui text-[0.72rem] uppercase tracking-wide-cf text-cf-parchment-muted">
+                <span class="inline-flex items-center gap-1.5">
+                  <svg viewBox="0 0 24 24" class="h-3.5 w-3.5" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M4 6h16v12H4z"/><path d="M8 10h8M8 14h5"/></svg>
+                  {{ post.comments.length }}
+                </span>
+                <span class="inline-flex items-center gap-1.5">
+                  <svg viewBox="0 0 24 24" class="h-3.5 w-3.5" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M6 4h12l2 4-2 12H6L4 8z"/></svg>
+                  {{ post.createdAt | date:'dd/MM/yy' }}
+                </span>
+              </div>
+            </div>
+          </article>
+        }
+      </div>
+    }
+  }
+
+  <app-confirm-dialog
+    [open]="deleteDialogOpen()"
+    title="Eliminar post"
+    message="Se eliminara este post de la galeria."
+    (confirmed)="confirmDelete()"
+    (cancelled)="cancelDelete()"
+  />
+
+  @if (authService.currentUser()) {
+    <button
+      [routerLink]="['/posts/new']"
+      class="fixed bottom-8 right-8 z-50 rounded-sm bg-gradient-to-br from-cf-gold to-cf-gold-dim px-6 py-3.5 font-heading text-[0.75rem] uppercase tracking-widest-cf text-cf-black shadow-gold-md transition-all duration-200 hover:-translate-y-0.5 hover:from-cf-gold-light hover:to-cf-gold hover:shadow-gold-lg active:scale-95"
+    >
+      Nueva Publicación
+    </button>
+  }
+</section>

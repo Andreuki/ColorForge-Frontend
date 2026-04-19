@@ -1,0 +1,8 @@
+<svg width="1280" height="960" viewBox="0 0 1280 960" xmlns="http://www.w3.org/2000/svg" role="img" aria-label="Dragon y miniaturas">
+  <rect width="1280" height="960" fill="#15151b"/>
+  <path d="M360 620 C480 420 780 390 920 560 C980 630 970 740 880 780 C760 830 560 820 420 760 C350 730 330 670 360 620 Z" fill="#374151"/>
+  <path d="M520 490 C590 410 730 400 800 470 C860 530 840 620 760 650 C660 690 540 670 500 600 C470 550 480 530 520 490 Z" fill="#dc2626"/>
+  <circle cx="760" cy="510" r="10" fill="#fbbf24"/>
+  <rect x="420" y="760" width="440" height="34" rx="12" fill="#b87333"/>
+  <text x="640" y="870" text-anchor="middle" font-family="Rajdhani, sans-serif" font-size="58" fill="#f0e68c">Placeholder Dragon</text>
+</svg>

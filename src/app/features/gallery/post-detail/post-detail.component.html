@@ -1,0 +1,408 @@
+<app-page-wrapper>
+  <section class="mx-auto max-w-6xl px-6 py-6">
+    <app-section-title title="Galería de miniaturas" subtitle="Explora obras de la comunidad" />
+
+    @if (loading()) {
+      <div class="flex items-center justify-center min-h-[60vh] text-cf-parchment-muted font-display text-lg flex-col gap-3">
+        <div class="w-8 h-8 rounded-full border-2 border-gold-subtle border-t-cf-gold animate-spin"></div>
+        <p class="text-cf-parchment-muted">Cargando miniatura...</p>
+      </div>
+    }
+
+    @if (!loading() && errorMessage()) {
+      <div class="mx-8 my-6 rounded-sm border border-cf-crimson bg-cf-surface p-4 text-center text-cf-crimson-light text-sm">{{ errorMessage() }}</div>
+    }
+
+    @if (!loading() && post()) {
+      <div class="py-6">
+        <button class="border border-gold-subtle text-cf-parchment-dim px-4 py-2 rounded-sm hover:border-cf-gold transition-colors mb-6 text-sm font-heading uppercase" (click)="goBack()">Volver a la galería</button>
+
+        <div class="grid gap-8 md:grid-cols-[1fr_380px]">
+          <div class="bg-cf-surface2 rounded-sm p-5 mb-5 border border-gold-subtle">
+            <div class="relative">
+              <img [src]="toAbsoluteUrl(activeImage())" class="w-full rounded-sm object-cover max-h-[500px]" [alt]="post()!.title || 'Miniatura'" />
+
+              <div class="absolute top-3 right-3 flex flex-col gap-2">
+                <button
+                  (click)="toggleSave()"
+                  [title]="isSaved() ? 'Quitar de guardados' : 'Guardar publicación'"
+                  class="w-10 h-10 rounded-full bg-cf-black/60 flex items-center justify-center hover:bg-cf-black/90 transition"
+                >
+                  @if (isSaved()) {
+                    <svg xmlns="http://www.w3.org/2000/svg" class="w-5 h-5 text-cf-gold" viewBox="0 0 24 24" fill="currentColor">
+                      <path d="M6 2a2 2 0 0 0-2 2v18l8-4 8 4V4a2 2 0 0 0-2-2H6z" />
+                    </svg>
+                  } @else {
+                    <svg xmlns="http://www.w3.org/2000/svg" class="w-5 h-5 text-cf-parchment" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                      <path d="M6 2a2 2 0 0 0-2 2v18l8-4 8 4V4a2 2 0 0 0-2-2H6z" />
+                    </svg>
+                  }
+                </button>
+
+                <button
+                  (click)="sharePost()"
+                  title="Compartir publicación"
+                  class="w-10 h-10 rounded-full bg-cf-black/60 flex items-center justify-center hover:bg-cf-black/90 transition"
+                >
+                  <svg xmlns="http://www.w3.org/2000/svg" class="w-5 h-5 text-cf-parchment" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                    <circle cx="18" cy="5" r="3" />
+                    <circle cx="6" cy="12" r="3" />
+                    <circle cx="18" cy="19" r="3" />
+                    <line x1="8.59" y1="13.51" x2="15.42" y2="17.49" />
+                    <line x1="15.41" y1="6.51" x2="8.59" y2="10.49" />
+                  </svg>
+                </button>
+
+                <button
+                  (click)="openFullscreen()"
+                  title="Ver en pantalla completa"
+                  class="w-10 h-10 rounded-full bg-cf-black/60 flex items-center justify-center hover:bg-cf-black/90 transition"
+                >
+                  <svg xmlns="http://www.w3.org/2000/svg" class="w-5 h-5 text-cf-parchment" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                    <polyline points="15 3 21 3 21 9" />
+                    <polyline points="9 21 3 21 3 15" />
+                    <line x1="21" y1="3" x2="14" y2="10" />
+                    <line x1="3" y1="21" x2="10" y2="14" />
+                  </svg>
+                </button>
+              </div>
+            </div>
+
+            @if ((post()?.imageUrls?.length ?? 0) > 1) {
+              <div class="flex gap-2 mt-3 overflow-x-auto">
+                @for (img of post()?.imageUrls; track img; let i = $index) {
+                  <img
+                    [src]="toAbsoluteUrl(img)"
+                    (click)="activeImage.set(img)"
+                    class="w-20 h-20 object-cover rounded-sm cursor-pointer border-2"
+                    [class.border-cf-gold]="activeImage() === img"
+                    [class.border-transparent]="activeImage() !== img"
+                    [alt]="'Vista ' + (i + 1)"
+                  />
+                }
+              </div>
+            }
+
+            @if (beforeImageUrl() && afterImageUrl()) {
+              <div class="mt-6">
+                <h4 class="font-heading uppercase tracking-widest mb-3 text-cf-parchment">
+                  ? Antes / Después
+                </h4>
+                <div class="relative overflow-hidden rounded-sm" style="height: 300px;">
+                  <img [src]="afterImageUrl()!" class="absolute inset-0 w-full h-full object-cover" />
+                  <img
+                    [src]="beforeImageUrl()!"
+                    class="absolute inset-0 w-full h-full object-cover"
+                    [style.clip-path]="'inset(0 ' + (100 - sliderPos()) + '% 0 0)'"
+                  />
+                  <input
+                    type="range"
+                    min="0"
+                    max="100"
+                    [value]="sliderPos()"
+                    (input)="sliderPos.set(+$any($event.target).value)"
+                    class="absolute inset-0 w-full h-full opacity-0 cursor-col-resize z-10"
+                  />
+                  <div
+                    class="absolute top-0 bottom-0 w-0.5 bg-cf-gold pointer-events-none"
+                    style="z-index: 5;"
+                    [style.left.%]="sliderPos()"
+                  >
+                    <div
+                      class="absolute top-1/2 -translate-y-1/2 -translate-x-1/2 w-8 h-8 bg-cf-gold rounded-full flex items-center justify-center text-cf-black font-bold text-xs"
+                    >
+                      ★
+                    </div>
+                  </div>
+                  <span class="absolute bottom-2 left-2 bg-cf-black/60 px-2 py-1 rounded-sm text-xs text-cf-parchment">Antes</span>
+                  <span class="absolute bottom-2 right-2 bg-cf-black/60 px-2 py-1 rounded-sm text-xs text-cf-parchment">Después</span>
+                </div>
+              </div>
+            }
+          </div>
+
+          <div class="bg-cf-surface2 rounded-sm p-5 mb-5 border border-gold-subtle">
+            <div class="flex items-start justify-between gap-4 mb-4">
+              <h1 class="text-3xl font-bold font-display text-cf-parchment">{{ post()?.title || 'Sin título' }}</h1>
+              <div class="flex items-center gap-1 shrink-0">
+                <span class="text-cf-gold text-xl">★</span>
+                <span class="text-xl font-bold text-cf-parchment">{{ averageRating() | number:'1.1-1' }}</span>
+                <span class="text-cf-parchment-muted text-sm">({{ post()?.ratings?.length }} votos)</span>
+              </div>
+            </div>
+
+            <div class="flex items-center gap-3 mb-6">
+              @if (authorId()) {
+                <a [routerLink]="authorProfileLink()" class="flex items-center gap-3 group">
+                  <img [src]="toAbsoluteUrl(authorAvatar())" class="w-10 h-10 rounded-full object-cover border border-cf-steel" [alt]="authorUsername()" />
+                  <div>
+                    <span class="font-heading uppercase tracking-widest hover:text-cf-gold transition-colors text-cf-parchment">{{ authorUsername() }}</span>
+                    <p class="text-xs text-cf-parchment-muted">{{ post()?.createdAt | date:'dd/MM/yyyy' }}</p>
+                  </div>
+                </a>
+              } @else {
+                <div class="flex items-center gap-3">
+                  <img [src]="toAbsoluteUrl(authorAvatar())" class="w-10 h-10 rounded-full object-cover border border-cf-steel" [alt]="authorUsername()" />
+                  <div>
+                    <span class="font-heading uppercase tracking-widest text-cf-parchment">{{ authorUsername() }}</span>
+                    <p class="text-xs text-cf-parchment-muted">{{ post()?.createdAt | date:'dd/MM/yyyy' }}</p>
+                  </div>
+                </div>
+              }
+              @if (authService.currentUser() && !isOwner()) {
+                <button (click)="toggleFollow()" class="px-4 py-1 rounded-sm border border-cf-gold text-cf-gold hover:bg-cf-gold hover:text-cf-black transition font-heading uppercase text-xs ml-auto">
+                  {{ isFollowing() ? 'Siguiendo' : 'Seguir' }}
+                </button>
+              }
+            </div>
+
+            <p class="text-cf-parchment-dim text-sm leading-relaxed mb-5">{{ post()!.description }}</p>
+
+            @if (post()?.techniques?.length) {
+              <div class="flex flex-wrap gap-2 mt-4">
+                @for (tech of post()?.techniques; track tech) {
+                  <span class="px-3 py-1 bg-cf-surface border border-gold-subtle rounded-sm text-cf-parchment-dim text-sm font-ui">{{ tech }}</span>
+                }
+              </div>
+            }
+
+            @if (post()?.colors?.length) {
+              <div class="flex flex-wrap gap-2 mt-3">
+                @for (color of post()?.colors; track color) {
+                  <span class="inline-flex items-center gap-2 px-3 py-1 bg-cf-surface border border-cf-steel rounded-sm text-cf-parchment-dim text-sm">
+                    <span class="w-4 h-4 rounded-full border border-cf-steel" [style.background-color]="color"></span>
+                    {{ color }}
+                  </span>
+                }
+              </div>
+            }
+
+            <div class="mt-6">
+              <h3 class="font-heading uppercase tracking-widest text-cf-parchment mb-3 text-sm">Valora esta obra</h3>
+              <div class="flex gap-1">
+                @for (i of [1,2,3,4,5]; track i) {
+                  <button
+                    (mouseenter)="hoverRating.set(i)"
+                    (mouseleave)="hoverRating.set(0)"
+                    (click)="ratePost(i)"
+                    class="text-2xl transition-colors"
+                    [class.text-cf-gold]="i <= (hoverRating() || (userRating()?.value ?? 0))"
+                    [class.text-cf-parchment-muted]="i > (hoverRating() || (userRating()?.value ?? 0))"
+                  >
+                    ★
+                  </button>
+                }
+              </div>
+            </div>
+
+            @if (isOwner()) {
+              <div class="mt-6 flex gap-2">
+                <button (click)="editPost()" class="flex-1 rounded-sm bg-cf-gold text-cf-black px-4 py-2 font-heading uppercase text-sm text-center hover:shadow-gold-lg">
+                  Editar
+                </button>
+              </div>
+            }
+          </div>
+        </div>
+
+        <!-- Comentarios -->
+        <div class="mt-8 bg-cf-surface2 rounded-sm p-5 border border-gold-subtle">
+          <h2 class="font-heading uppercase tracking-widest text-cf-parchment text-lg mb-4">Comentarios</h2>
+
+          @if (authService.currentUser()) {
+            <div class="mb-6 bg-cf-surface rounded-sm p-4 border border-gold-subtle">
+              <textarea
+                [value]="commentText()"
+                (input)="commentText.set($any($event.target).value)"
+                placeholder="Comparte tu opinión sobre esta obra..."
+                rows="3"
+                class="w-full bg-cf-black border border-gold-subtle rounded-sm px-4 py-3 text-cf-parchment placeholder-cf-parchment-muted focus:outline-none focus:border-cf-gold"
+              ></textarea>
+
+              <div class="mt-3 grid gap-3 md:grid-cols-[1fr_auto]">
+                <input
+                  type="url"
+                  [value]="commentLink()"
+                  (input)="commentLink.set($any($event.target).value)"
+                  placeholder="Añadir enlace (opcional)"
+                  class="w-full bg-cf-black border border-gold-subtle rounded-sm px-4 py-2 text-cf-parchment placeholder-cf-parchment-muted focus:outline-none focus:border-cf-gold"
+                />
+
+                <div class="flex items-center gap-2">
+                  <input
+                    #commentImageInput
+                    type="file"
+                    accept="image/*"
+                    class="hidden"
+                    (change)="onCommentImageSelected($event)"
+                  />
+                  <button
+                    type="button"
+                    class="px-3 py-2 rounded-sm border border-cf-gold text-cf-gold hover:bg-cf-gold hover:text-cf-black transition font-heading uppercase text-xs"
+                    (click)="commentImageInput.click()"
+                  >
+                    Adjuntar foto
+                  </button>
+                </div>
+              </div>
+
+              @if (commentImagePreview()) {
+                <div class="mt-3 inline-flex items-center gap-3 rounded-sm border border-gold-subtle bg-cf-black/40 p-2">
+                  <img [src]="commentImagePreview()!" alt="Vista previa" class="h-16 w-16 rounded-sm object-cover" />
+                  <button
+                    type="button"
+                    class="text-xs font-heading uppercase text-cf-crimson-light hover:text-cf-crimson"
+                    (click)="commentImageFile.set(null); commentImagePreview.set(null)"
+                  >
+                    Quitar
+                  </button>
+                </div>
+              }
+
+              <div class="mt-2 flex gap-2">
+                <button
+                  (click)="submitComment()"
+                  [disabled]="commentLoading() || !commentText().trim()"
+                  class="bg-gradient-to-br from-cf-gold to-cf-gold-dim text-cf-black font-heading rounded-sm px-4 py-2 hover:shadow-gold-lg uppercase text-sm disabled:opacity-50"
+                >
+                  @if (commentLoading()) { Enviando... } @else { Comentar }
+                </button>
+              </div>
+
+              @if (commentError()) {
+                <p class="text-cf-crimson-light text-xs mt-2">{{ commentError() }}</p>
+              }
+            </div>
+          }
+
+          <!-- Lista de comentarios -->
+          <div class="space-y-4">
+            @if (comments().length === 0 && !commentLoading()) {
+              <p class="text-cf-parchment-muted text-sm italic">No hay comentarios aún. ¡Sé el primero en comentar!</p>
+            }
+
+            @for (comment of comments(); track comment._id) {
+              <div class="bg-cf-surface rounded-sm p-4 border border-gold-subtle">
+                <div class="flex items-start justify-between gap-2 mb-2">
+                  <div class="flex items-center gap-2">
+                    <img [src]="toAbsoluteUrl(comment.userId.avatar ?? '')" class="w-8 h-8 rounded-full object-cover border border-cf-steel" [alt]="commentAuthor(comment.userId)" />
+                    <div>
+                      <p class="font-heading uppercase tracking-widest text-cf-parchment text-sm">{{ commentAuthor(comment.userId) }}</p>
+                      <p class="text-xs text-cf-parchment-muted">{{ comment.createdAt | date:'dd/MM/yyyy HH:mm' }}</p>
+                    </div>
+                  </div>
+                  @if (canDeleteComment(comment)) {
+                    <div class="flex items-center gap-3">
+                      @if (comment.userId._id === currentUser()?._id) {
+                        <button
+                          type="button"
+                          (click)="startEditComment(comment)"
+                          class="text-cf-gold hover:text-cf-gold-light text-sm font-heading uppercase"
+                        >
+                          Editar
+                        </button>
+                      }
+                      <button
+                        (click)="askDeleteComment(comment)"
+                        class="text-cf-crimson-light hover:text-cf-crimson text-sm font-heading uppercase"
+                      >
+                        Eliminar
+                      </button>
+                    </div>
+                  }
+                </div>
+                @if (editingCommentId() === comment._id) {
+                  <div class="space-y-3">
+                    <textarea
+                      #editCommentTextInput
+                      [value]="editCommentText()"
+                      (input)="editCommentText.set($any($event.target).value)"
+                      rows="3"
+                      class="w-full bg-cf-black border border-gold-subtle rounded-sm px-4 py-3 text-cf-parchment placeholder-cf-parchment-muted focus:outline-none focus:border-cf-gold"
+                    ></textarea>
+
+                    <div class="mt-3 grid gap-3 md:grid-cols-[1fr_auto]">
+                      <input
+                        type="url"
+                        [value]="editCommentLink()"
+                        (input)="editCommentLink.set($any($event.target).value)"
+                        placeholder="Enlace (opcional)"
+                        class="w-full bg-cf-black border border-gold-subtle rounded-sm px-4 py-2 text-cf-parchment placeholder-cf-parchment-muted focus:outline-none focus:border-cf-gold"
+                      />
+
+                      <div class="flex items-center gap-2">
+                        <label class="px-3 py-2 rounded-sm border border-cf-gold text-cf-gold hover:bg-cf-gold hover:text-cf-black transition font-heading uppercase text-xs cursor-pointer">
+                          Cambiar foto
+                          <input type="file" accept="image/*" class="hidden" (change)="onEditCommentImageSelected($event)" />
+                        </label>
+                      </div>
+                    </div>
+
+                    @if (editCommentImagePreview() || comment.imageUrl) {
+                      <div class="mt-3 inline-flex items-center gap-3 rounded-sm border border-gold-subtle bg-cf-black/40 p-2">
+                        <img [src]="editCommentImagePreview() || toAbsoluteUrl(comment.imageUrl)" alt="Vista previa" class="h-16 w-16 rounded-sm object-cover" />
+                        <button
+                          type="button"
+                          class="text-xs font-heading uppercase text-cf-crimson-light hover:text-cf-crimson"
+                          (click)="editCommentImageFile.set(null); editCommentImagePreview.set(null)"
+                        >
+                          Quitar
+                        </button>
+                      </div>
+                    }
+
+                    <div class="flex gap-2">
+                      <button
+                        type="button"
+                        class="bg-gradient-to-br from-cf-gold to-cf-gold-dim text-cf-black font-heading rounded-sm px-4 py-2 uppercase text-xs"
+                        (click)="saveEditComment(comment._id, editCommentTextInput.value)"
+                      >
+                        Guardar
+                      </button>
+                      <button
+                        type="button"
+                        class="border border-gold-subtle text-cf-parchment-dim rounded-sm px-4 py-2 uppercase text-xs hover:border-cf-gold"
+                        (click)="cancelEditComment()"
+                      >
+                        Cancelar
+                      </button>
+                    </div>
+                  </div>
+                } @else {
+                  <p class="text-cf-parchment-dim text-sm leading-relaxed">{{ comment.text }}</p>
+                }
+
+                @if (comment.imageUrl) {
+                  <img
+                    [src]="toAbsoluteUrl(comment.imageUrl)"
+                    class="mt-2 max-h-48 rounded border border-[#b8960c]/30"
+                    alt="Imagen adjunta"
+                  />
+                }
+
+                @if (comment.link) {
+                  <a
+                    [href]="comment.link"
+                    target="_blank"
+                    rel="noopener"
+                    class="mt-1 block text-[#b8960c] underline text-sm hover:text-[#d4a832] transition-colors truncate"
+                  >
+                    {{ comment.link }}
+                  </a>
+                }
+              </div>
+            }
+          </div>
+        </div>
+      </div>
+    }
+
+    <app-confirm-dialog
+      [open]="deleteCommentDialogOpen()"
+      title="Eliminar comentario"
+      message="Este comentario se eliminará de forma permanente."
+      (confirmed)="confirmDeleteComment()"
+      (cancelled)="cancelDeleteComment()"
+    />
+  </section>
+</app-page-wrapper>

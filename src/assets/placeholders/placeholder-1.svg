@@ -1,0 +1,18 @@
+<svg width="1280" height="960" viewBox="0 0 1280 960" xmlns="http://www.w3.org/2000/svg" role="img" aria-label="Martillo y yunque con pintura">
+  <defs>
+    <linearGradient id="bg" x1="0" y1="0" x2="1" y2="1">
+      <stop offset="0" stop-color="#141417"/>
+      <stop offset="1" stop-color="#23232a"/>
+    </linearGradient>
+  </defs>
+  <rect width="1280" height="960" fill="url(#bg)"/>
+  <circle cx="640" cy="470" r="190" fill="#111827"/>
+  <rect x="520" y="380" width="250" height="44" rx="12" fill="#6b7280"/>
+  <rect x="600" y="420" width="90" height="110" rx="12" fill="#4b5563"/>
+  <rect x="470" y="310" width="230" height="34" rx="10" fill="#a16207" transform="rotate(-20 470 310)"/>
+  <circle cx="585" cy="350" r="14" fill="#f59e0b"/>
+  <circle cx="675" cy="338" r="14" fill="#ef4444"/>
+  <circle cx="630" cy="300" r="13" fill="#22c55e"/>
+  <circle cx="725" cy="290" r="12" fill="#3b82f6"/>
+  <text x="640" y="810" text-anchor="middle" font-family="Rajdhani, sans-serif" font-size="58" fill="#f0e68c">Placeholder Forja</text>
+</svg>

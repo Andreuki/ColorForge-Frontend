@@ -1,0 +1,46 @@
+<app-page-wrapper>
+  <section class="mx-auto max-w-md px-6 py-10">
+    <app-section-title title="Crear cuenta" subtitle="Únete a la comunidad ColorForge" />
+    <div class="bg-cf-surface2 border border-gold-subtle rounded-sm p-6 md:p-8">
+      <form (submit)="onSubmit(); $event.preventDefault()" novalidate class="space-y-4">
+        <div>
+          <label for="username" class="font-heading text-[0.72rem] tracking-widest-cf uppercase text-cf-gold block mb-1.5">Nombre de usuario</label>
+          <input id="username" type="text" [value]="model().username" (input)="onInput('username', $event)" (blur)="touchField('username')" class="bg-cf-surface border border-gold-subtle rounded-sm text-cf-parchment font-body text-base px-4 py-2.5 w-full placeholder:text-cf-parchment-muted focus:outline-none focus:border-cf-gold focus:ring-2 focus:ring-[rgba(200,146,42,0.1)] transition-all duration-200" placeholder="Artesano_Oscuro" autocomplete="username" />
+          @if (touched().username && usernameError()) { <span class="text-cf-crimson-light text-xs mt-1 block">{{ usernameError() }}</span> }
+        </div>
+
+        <div>
+          <label for="email" class="font-heading text-[0.72rem] tracking-widest-cf uppercase text-cf-gold block mb-1.5">Correo electrónico</label>
+          <input id="email" type="email" [value]="model().email" (input)="onInput('email', $event)" (blur)="touchField('email')" class="bg-cf-surface border border-gold-subtle rounded-sm text-cf-parchment font-body text-base px-4 py-2.5 w-full placeholder:text-cf-parchment-muted focus:outline-none focus:border-cf-gold focus:ring-2 focus:ring-[rgba(200,146,42,0.1)] transition-all duration-200" placeholder="tu@email.com" autocomplete="email" />
+          @if (touched().email && emailError()) { <span class="text-cf-crimson-light text-xs mt-1 block">{{ emailError() }}</span> }
+        </div>
+
+        <div>
+          <label for="password" class="font-heading text-[0.72rem] tracking-widest-cf uppercase text-cf-gold block mb-1.5">Contraseña</label>
+          <input id="password" type="password" [value]="model().password" (input)="onInput('password', $event)" (blur)="touchField('password')" class="bg-cf-surface border border-gold-subtle rounded-sm text-cf-parchment font-body text-base px-4 py-2.5 w-full placeholder:text-cf-parchment-muted focus:outline-none focus:border-cf-gold focus:ring-2 focus:ring-[rgba(200,146,42,0.1)] transition-all duration-200" placeholder="••••••••" autocomplete="new-password" />
+          @if (touched().password && passwordError()) { <span class="text-cf-crimson-light text-xs mt-1 block">{{ passwordError() }}</span> }
+        </div>
+
+        <div>
+          <label for="confirmPassword" class="font-heading text-[0.72rem] tracking-widest-cf uppercase text-cf-gold block mb-1.5">Confirmar contraseña</label>
+          <input id="confirmPassword" type="password" [value]="model().confirmPassword" (input)="onInput('confirmPassword', $event)" (blur)="touchField('confirmPassword')" class="bg-cf-surface border border-gold-subtle rounded-sm text-cf-parchment font-body text-base px-4 py-2.5 w-full placeholder:text-cf-parchment-muted focus:outline-none focus:border-cf-gold focus:ring-2 focus:ring-[rgba(200,146,42,0.1)] transition-all duration-200" placeholder="••••••••" autocomplete="new-password" />
+          @if (touched().confirmPassword && confirmPasswordError()) { <span class="text-cf-crimson-light text-xs mt-1 block">{{ confirmPasswordError() }}</span> }
+          @if (passwordMismatch() && touched().confirmPassword) { <span class="text-cf-crimson-light text-xs mt-1 block">Las contraseñas no coinciden.</span> }
+        </div>
+
+        @if (errorMessage()) {
+          <div class="border border-cf-crimson bg-cf-surface p-3 text-cf-parchment text-sm">{{ errorMessage() }}</div>
+        }
+
+        <button type="submit" class="w-full bg-gradient-to-br from-cf-gold to-cf-gold-dim text-cf-black font-heading text-[0.75rem] tracking-widest-cf uppercase px-6 py-3 rounded-sm shadow-gold-md hover:-translate-y-0.5 hover:shadow-gold-lg active:scale-95 transition-all duration-200 disabled:opacity-60" [disabled]="loading() || formInvalid()">
+          @if (loading()) { Creando cuenta... } @else { Crear cuenta }
+        </button>
+      </form>
+
+      <p class="font-body text-cf-parchment-dim text-sm text-center mt-5">
+        ¿Ya tienes cuenta?
+        <a routerLink="/login" class="text-cf-gold hover:text-cf-gold-light transition-colors">Inicia sesión</a>
+      </p>
+    </div>
+  </section>
+</app-page-wrapper>
