@@ -77,7 +77,7 @@ export class ResetPasswordComponent {
   validationError = computed(() => {
     if (!this.token()) return 'Token invalido o ausente.';
     if (!this.password()) return 'La contrasena es obligatoria.';
-    if (this.password().length < 6) return 'Minimo 6 caracteres.';
+    if (this.password().length < 8) return 'Minimo 8 caracteres.';
     if (this.password() !== this.confirmPassword()) return 'Las contrasenas no coinciden.';
     return null;
   });

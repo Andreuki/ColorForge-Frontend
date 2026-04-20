@@ -48,8 +48,8 @@ export class ProfileEditComponent {
 
   passwordForm = this.#fb.group(
     {
-      password: ['', [Validators.required, Validators.minLength(4)]],
-      passwordConfirm: ['', [Validators.required, Validators.minLength(4)]],
+      password: ['', [Validators.required, Validators.minLength(8)]],
+      passwordConfirm: ['', [Validators.required, Validators.minLength(8)]],
     },
     {
       validators: (group) => {

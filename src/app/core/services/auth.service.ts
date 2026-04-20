@@ -12,19 +12,30 @@ export class AuthService {
   private readonly http = inject(HttpClient);
   private readonly router = inject(Router);
   private readonly currentUserSignal = signal<User | null>(null);
+  private readonly initializationDone = signal(false);
 
   // Compatibilidad con componentes que usan Observable
   currentUser$ = toObservable(this.currentUserSignal);
+  readonly initialized$ = toObservable(this.initializationDone);
   currentUser = this.currentUserSignal.asReadonly();
   isAdmin = computed(() => this.currentUserSignal()?.role === 'admin');
 
   constructor() {
     if (this.isLoggedIn()) {
       this.getMe().subscribe({
-        next: (user) => this.currentUserSignal.set(user),
-        error: () => this.logout(),
+        next: (user) => {
+          this.currentUserSignal.set(user);
+          this.initializationDone.set(true);
+        },
+        error: () => {
+          this.logout();
+          this.initializationDone.set(true);
+        },
       });
+      return;
     }
+
+    this.initializationDone.set(true);
   }
 
   register(username: string, email: string, password: string): Observable<User> {

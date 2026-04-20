@@ -48,7 +48,7 @@ export class RegisterComponent {
   passwordError = computed(() => {
     const password = this.model().password;
     if (!password) return 'La contrasena es obligatoria.';
-    return password.length >= 6 ? null : 'Minimo 6 caracteres.';
+    return password.length >= 8 ? null : 'Minimo 8 caracteres.';
   });
 
   confirmPasswordError = computed(() => {

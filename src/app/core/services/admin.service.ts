@@ -6,7 +6,7 @@ import { environment } from '../../../environments/environment';
 @Injectable({ providedIn: 'root' })
 export class AdminService {
   #http = inject(HttpClient);
-  #base = `${environment.apiUrl}/api/users/admin`;
+  #base = `${environment.apiUrl}/api/admin`;
 
   #cleanParams(params: Record<string, unknown>): Record<string, string | number | boolean> {
     const cleaned: Record<string, string | number | boolean> = {};
@@ -72,6 +72,11 @@ export class AdminService {
 
   deleteAnalysis(id: string): Observable<void> {
     return this.#http.delete<void>(`${this.#base}/analyses/${id}`);
+  }
+
+  // Challenges
+  getChallenges(): Observable<any> {
+    return this.#http.get<any>(`${this.#base}/challenges`);
   }
 
   // Comentarios

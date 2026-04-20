@@ -83,42 +83,6 @@
               </div>
             }
 
-            @if (beforeImageUrl() && afterImageUrl()) {
-              <div class="mt-6">
-                <h4 class="font-heading uppercase tracking-widest mb-3 text-cf-parchment">
-                  ? Antes / Después
-                </h4>
-                <div class="relative overflow-hidden rounded-sm" style="height: 300px;">
-                  <img [src]="afterImageUrl()!" class="absolute inset-0 w-full h-full object-cover" />
-                  <img
-                    [src]="beforeImageUrl()!"
-                    class="absolute inset-0 w-full h-full object-cover"
-                    [style.clip-path]="'inset(0 ' + (100 - sliderPos()) + '% 0 0)'"
-                  />
-                  <input
-                    type="range"
-                    min="0"
-                    max="100"
-                    [value]="sliderPos()"
-                    (input)="sliderPos.set(+$any($event.target).value)"
-                    class="absolute inset-0 w-full h-full opacity-0 cursor-col-resize z-10"
-                  />
-                  <div
-                    class="absolute top-0 bottom-0 w-0.5 bg-cf-gold pointer-events-none"
-                    style="z-index: 5;"
-                    [style.left.%]="sliderPos()"
-                  >
-                    <div
-                      class="absolute top-1/2 -translate-y-1/2 -translate-x-1/2 w-8 h-8 bg-cf-gold rounded-full flex items-center justify-center text-cf-black font-bold text-xs"
-                    >
-                      ★
-                    </div>
-                  </div>
-                  <span class="absolute bottom-2 left-2 bg-cf-black/60 px-2 py-1 rounded-sm text-xs text-cf-parchment">Antes</span>
-                  <span class="absolute bottom-2 right-2 bg-cf-black/60 px-2 py-1 rounded-sm text-xs text-cf-parchment">Después</span>
-                </div>
-              </div>
-            }
           </div>
 
           <div class="bg-cf-surface2 rounded-sm p-5 mb-5 border border-gold-subtle">

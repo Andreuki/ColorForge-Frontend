@@ -37,13 +37,6 @@ export class AnalysisService {
       .pipe(map((res) => res.data));
   }
 
-  /** Endpoint específico para recuperar análisis persistido por ID */
-  getSavedAnalysisById(id: string): Observable<Analysis> {
-    return this.http
-      .get<{ success: boolean; data: Analysis }>(`${environment.apiUrl}/api/save-analysis/${id}`)
-      .pipe(map((res) => res.data));
-  }
-
   deleteAnalysis(id: string | number): Observable<void> {
     const normalizedId = this.resolveId(id);
     return this.http.delete<void>(`${environment.apiUrl}/api/analyses/${normalizedId}`);
@@ -58,20 +51,20 @@ export class AnalysisService {
       .pipe(map((res) => res.data));
   }
 
-  requestCoachFeedback(payload: {
-    postId?: string;
-    image?: File;
-  }): Observable<{ feedback: string }> {
+  /**
+   * Solicita feedback de IA para un análisis concreto.
+   * Llama a POST /api/analysis/:analysisId/coach
+   * @param analysisId  ID del análisis cuya imagen se usará
+   * @param image       Imagen opcional para sobrescribir la del análisis
+   */
+  requestCoachFeedback(analysisId: string, image?: File): Observable<{ feedback: string }> {
     const formData = new FormData();
-    if (payload.image) formData.append('image', payload.image);
-
-    if (payload.postId) {
-      return this.http.post<{ feedback: string }>(
-        `${environment.apiUrl}/api/posts/${payload.postId}/coach`,
-        formData
-      );
+    if (image) {
+      formData.append('image', image);
     }
-
-    return this.http.post<{ feedback: string }>(`${environment.apiUrl}/api/analysis/coach`, formData);
+    return this.http.post<{ feedback: string }>(
+      `${environment.apiUrl}/api/analysis/${analysisId}/coach`,
+      formData
+    );
   }
 }

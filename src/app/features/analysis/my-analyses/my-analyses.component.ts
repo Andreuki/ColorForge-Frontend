@@ -30,7 +30,7 @@ export class MyAnalysesComponent implements OnInit {
   deleteTarget = signal<Analysis | null>(null);
 
   coachDialogOpen = signal(false);
-  coachTargetPostId = signal<string | null>(null);
+  coachTargetAnalysisId = signal<string | null>(null);
   coachImageFile = signal<File | null>(null);
   coachImagePreview = signal<string | null>(null);
   coachFeedback = signal<string | null>(null);
@@ -151,7 +151,8 @@ export class MyAnalysesComponent implements OnInit {
 
   openCoachDialog(analysis: Analysis, event: Event): void {
     event.stopPropagation();
-    this.coachTargetPostId.set(this.resolveCoachPostId(analysis));
+    const id = String(analysis._id ?? analysis.id ?? '');
+    this.coachTargetAnalysisId.set(id || null);
     this.coachImageFile.set(null);
     this.coachImagePreview.set(null);
     this.coachFeedback.set(null);
@@ -162,7 +163,7 @@ export class MyAnalysesComponent implements OnInit {
   closeCoachDialog(): void {
     this.coachDialogOpen.set(false);
     this.coachLoading.set(false);
-    this.coachTargetPostId.set(null);
+    this.coachTargetAnalysisId.set(null);
   }
 
   onCoachImageSelected(event: Event): void {
@@ -179,19 +180,20 @@ export class MyAnalysesComponent implements OnInit {
   }
 
   requestCoachFeedback(): void {
-    const postId = this.coachTargetPostId();
-    const image = this.coachImageFile();
-    if (!postId && !image) {
-      this.coachError.set('Sube una imagen para pedir consejo sin publicacion vinculada.');
+    const analysisId = this.coachTargetAnalysisId();
+    if (!analysisId) {
+      this.coachError.set('No se pudo identificar el análisis. Cierra el diálogo y vuelve a intentarlo.');
       return;
     }
+
+    const image = this.coachImageFile();
 
     this.coachLoading.set(true);
     this.coachFeedback.set(null);
     this.coachError.set(null);
 
     this.analysisService
-      .requestCoachFeedback({ postId: postId ?? undefined, image: image ?? undefined })
+      .requestCoachFeedback(analysisId, image ?? undefined)
       .subscribe({
         next: (res) => {
           this.coachFeedback.set(res.feedback);
@@ -202,11 +204,5 @@ export class MyAnalysesComponent implements OnInit {
           this.coachLoading.set(false);
         },
       });
-  }
-
-  private resolveCoachPostId(analysis: Analysis): string | null {
-    const raw = (analysis as any).postId ?? (analysis as any).post?._id ?? (analysis as any).post?.id;
-    if (raw === undefined || raw === null || String(raw).trim() === '') return null;
-    return String(raw);
   }
 }

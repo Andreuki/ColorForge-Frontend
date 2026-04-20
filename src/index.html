@@ -13,6 +13,14 @@
     href="https://fonts.googleapis.com/css2?family=Cinzel+Decorative:wght@400;700&family=Cinzel:wght@400;600&family=Crimson+Text:ital,wght@0,400;0,600;1,400&family=Rajdhani:wght@400;500;600&display=swap"
     rel="stylesheet"
   />
+
+  <script>
+    // En producción, nginx/Docker debe reemplazar estos placeholders sin recompilar Angular.
+    window.__env = {
+      API_URL: '__API_URL__',
+      UPLOADS_URL: '__UPLOADS_URL__'
+    };
+  </script>
 </head>
 <body class="bg-cf-black text-cf-parchment font-body">
   <app-root></app-root>

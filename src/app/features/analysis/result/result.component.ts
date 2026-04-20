@@ -11,7 +11,6 @@ import {
 import { ReactiveFormsModule, FormBuilder, Validators } from '@angular/forms';
 import { Router, RouterLink } from '@angular/router';
 import { DatePipe, NgClass } from '@angular/common';
-import { catchError } from 'rxjs/operators';
 import { PageWrapperComponent } from '../../../shared/components/page-wrapper/page-wrapper.component';
 import { SectionTitleComponent } from '../../../shared/components/section-title/section-title.component';
 import { AnalysisService } from '../../../core/services/analysis.service';
@@ -100,8 +99,7 @@ export class ResultComponent implements OnInit {
 
   ngOnInit(): void {
     this.analysisService
-      .getSavedAnalysisById(this.id())
-      .pipe(catchError(() => this.analysisService.getAnalysisById(this.id())))
+      .getAnalysisById(this.id())
       .subscribe({
       next: (data) => {
         this.analysis.set(data);
@@ -228,18 +226,33 @@ export class ResultComponent implements OnInit {
   }
 
   loadFactionImage(factionName: string): void {
-    const searchTerm = factionName.split('(')[0].trim();
-    const url = `https://en.wikipedia.org/api/rest_v1/page/summary/${encodeURIComponent(searchTerm)}`;
+    const normalizedFaction = factionName.split('(')[0].trim();
 
-    fetch(url)
-      .then((response) => response.json())
-      .then((data: { thumbnail?: { source?: string } }) => {
+    if (!normalizedFaction || normalizedFaction === 'No identificada con certeza') {
+      this.factionImageUrl.set(null);
+      return;
+    }
+
+    const encodedFaction = encodeURIComponent(normalizedFaction);
+    const wikipediaUrl = `https://en.wikipedia.org/api/rest_v1/page/summary/${encodedFaction}`;
+
+    fetch(wikipediaUrl)
+      .then((response) => {
+        if (!response.ok) {
+          this.factionImageUrl.set(null);
+          return null;
+        }
+        return response.json();
+      })
+      .then((data: { thumbnail?: { source?: string } } | null) => {
         if (data?.thumbnail?.source) {
           this.factionImageUrl.set(data.thumbnail.source);
         } else {
           this.factionImageUrl.set(null);
         }
       })
-      .catch(() => this.factionImageUrl.set(null));
+      .catch(() => {
+        this.factionImageUrl.set(null);
+      });
   }
 }

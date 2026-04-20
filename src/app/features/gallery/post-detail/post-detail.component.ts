@@ -14,7 +14,6 @@ import { PageWrapperComponent } from '../../../shared/components/page-wrapper/pa
 import { SectionTitleComponent } from '../../../shared/components/section-title/section-title.component';
 import { PostService } from '../../../core/services/post.service';
 import { AuthService } from '../../../core/services/auth.service';
-import { AnalysisService } from '../../../core/services/analysis.service';
 import { Post, Comment } from '../../../shared/models/post.model';
 import { ToastService } from '../../../shared/services/toast.service';
 import { ConfirmDialogComponent } from '../../../shared/components/confirm-dialog/confirm-dialog.component';
@@ -30,7 +29,6 @@ import { toAbsoluteUrl } from '../../../shared/utils/url.helper';
 })
 export class PostDetailComponent implements OnInit {
   private readonly postService = inject(PostService);
-  private readonly analysisService = inject(AnalysisService);
   readonly authService = inject(AuthService);
   private readonly toast = inject(ToastService);
   private readonly router = inject(Router);
@@ -67,26 +65,9 @@ export class PostDetailComponent implements OnInit {
   editCommentImagePreview = signal<string | null>(null);
 
   activeImage = signal<string | null>(null);
-  sliderPos = signal(50);
-  beforeImageFromAnalysis = signal<string | null>(null);
   isFollowing = signal(false);
   isFullscreen = signal(false);
   readonly toAbsoluteUrl = toAbsoluteUrl;
-
-  beforeImageUrl = computed(() => {
-    const analysisRef = this.post()?.analysisId;
-    if (analysisRef && typeof analysisRef !== 'string' && analysisRef.imageUrl) {
-      return toAbsoluteUrl(analysisRef.imageUrl);
-    }
-    return this.beforeImageFromAnalysis();
-  });
-
-  afterImageUrl = computed(() => {
-    const post = this.post();
-    if (!post) return null;
-    const after = post.imageUrls?.[0] ?? post.imageUrl;
-    return after ? toAbsoluteUrl(after) : null;
-  });
 
   isSaved = computed(() => {
     const me = getUserId(this.currentUser());
@@ -184,7 +165,6 @@ export class PostDetailComponent implements OnInit {
     this.postService.getPostById(this.id()).subscribe({
       next: (data) => {
         this.post.set(data);
-        this.loadBeforeImageFromAnalysis(data.analysisId);
         this.loading.set(false);
       },
       error: (err) => {
@@ -200,31 +180,6 @@ export class PostDetailComponent implements OnInit {
 
   commentAuthor(userId: Comment['userId']): string {
     return userId.username ?? 'Usuario';
-  }
-
-  private loadBeforeImageFromAnalysis(
-    analysisRef: Post['analysisId'] | undefined
-  ): void {
-    const analysisId =
-      typeof analysisRef === 'string'
-        ? analysisRef
-        : String(analysisRef?._id ?? analysisRef?.id ?? '');
-
-    if (!analysisId) {
-      this.beforeImageFromAnalysis.set(null);
-      return;
-    }
-
-    this.analysisService.getAnalysisById(analysisId).subscribe({
-      next: (analysis) => {
-        this.beforeImageFromAnalysis.set(
-          analysis.imageUrl ? toAbsoluteUrl(analysis.imageUrl) : null
-        );
-      },
-      error: () => {
-        this.beforeImageFromAnalysis.set(null);
-      },
-    });
   }
 
   private commentId(comment: Comment): string {
