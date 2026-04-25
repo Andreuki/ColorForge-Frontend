@@ -3,6 +3,7 @@ import {
   Component,
   computed,
   effect,
+  HostListener,
   inject,
   input,
   OnInit,
@@ -18,7 +19,7 @@ import { Post, Comment } from '../../../shared/models/post.model';
 import { ToastService } from '../../../shared/services/toast.service';
 import { ConfirmDialogComponent } from '../../../shared/components/confirm-dialog/confirm-dialog.component';
 import { getUserId } from '../../../shared/models/user.model';
-import { toAbsoluteUrl } from '../../../shared/utils/url.helper';
+import { toAbsoluteUrl, onAvatarError } from '../../../shared/utils/url.helper';
 
 @Component({
   selector: 'app-post-detail',
@@ -68,6 +69,7 @@ export class PostDetailComponent implements OnInit {
   isFollowing = signal(false);
   isFullscreen = signal(false);
   readonly toAbsoluteUrl = toAbsoluteUrl;
+  readonly onAvatarError = onAvatarError;
 
   isSaved = computed(() => {
     const me = getUserId(this.currentUser());
@@ -359,6 +361,27 @@ export class PostDetailComponent implements OnInit {
 
   openFullscreen(): void {
     this.isFullscreen.set(true);
+  }
+
+  closeFullscreen(): void {
+    this.isFullscreen.set(false);
+  }
+
+  navigateFullscreen(direction: 1 | -1): void {
+    const images = this.post()?.imageUrls ?? [];
+    if (images.length <= 1) return;
+
+    const current = this.activeImage();
+    const currentIndex = images.indexOf(current ?? '');
+    const nextIndex = (currentIndex + direction + images.length) % images.length;
+    this.activeImage.set(images[nextIndex]);
+  }
+
+  @HostListener('document:keydown.escape')
+  onEscapeKey(): void {
+    if (this.isFullscreen()) {
+      this.closeFullscreen();
+    }
   }
 
   editPost(): void {

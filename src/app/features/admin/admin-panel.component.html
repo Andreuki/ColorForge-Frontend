@@ -100,7 +100,7 @@
                     <td class="px-4 py-3 text-cf-parchment-dim">
                       <div class="flex items-center gap-2">
                         @if (user.avatar) {
-                          <img [src]="user.avatar" class="w-6 h-6 rounded-full object-cover" alt="Avatar" />
+                          <img [src]="user.avatar" (error)="onAvatarError($event)" class="w-6 h-6 rounded-full object-cover" alt="Avatar" />
                         }
                         <a [routerLink]="['/profile', user._id]" class="text-cf-gold hover:underline transition-colors">
                           {{ user.username }}

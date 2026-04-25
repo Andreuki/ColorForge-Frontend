@@ -7,7 +7,7 @@ import { ChallengeService } from '../../core/services/challenge.service';
 import { ForgeBadgeComponent } from '../../shared/components/forge-badge/forge-badge.component';
 import { PageWrapperComponent } from '../../shared/components/page-wrapper/page-wrapper.component';
 import { SectionTitleComponent } from '../../shared/components/section-title/section-title.component';
-import { toAbsoluteUrl } from '../../shared/utils/url.helper';
+import { toAbsoluteUrl, onAvatarError } from '../../shared/utils/url.helper';
 
 @Component({
   selector: 'app-ranking',
@@ -20,6 +20,7 @@ export class RankingComponent {
   #http = inject(HttpClient);
   #challengeService = inject(ChallengeService);
   readonly toAbsoluteUrl = toAbsoluteUrl;
+  readonly onAvatarError = onAvatarError;
 
   users = signal<any[]>([]);
   activeChallenge = signal<any>(null);

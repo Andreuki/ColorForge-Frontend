@@ -14,7 +14,7 @@ import { ChallengeService } from '../../core/services/challenge.service';
 import { ConfirmDialogComponent } from '../../shared/components/confirm-dialog/confirm-dialog.component';
 import { PageWrapperComponent } from '../../shared/components/page-wrapper/page-wrapper.component';
 import { SectionTitleComponent } from '../../shared/components/section-title/section-title.component';
-import { toAbsoluteUrl } from '../../shared/utils/url.helper';
+import { toAbsoluteUrl, onAvatarError } from '../../shared/utils/url.helper';
 
 type AdminTab = 'stats' | 'users' | 'posts' | 'analyses' | 'challenges';
 
@@ -31,6 +31,7 @@ export class AdminPanelComponent {
   #destroyRef = inject(DestroyRef);
 
   readonly toAbsoluteUrl = toAbsoluteUrl;
+  readonly onAvatarError = onAvatarError;
 
   activeTab = signal<AdminTab>('stats');
   readonly tabs: ReadonlyArray<{ id: AdminTab; label: string }> = [

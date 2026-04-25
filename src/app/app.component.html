@@ -12,12 +12,23 @@
       </a>
 
       <button
-        class="rounded-sm border border-gold-subtle px-3 py-1.5 text-cf-parchment-dim transition-colors duration-200 hover:text-cf-gold md:hidden"
+        class="rounded-sm border border-gold-subtle p-2 text-cf-parchment-dim transition-colors duration-200 hover:text-cf-gold md:hidden"
         (click)="toggleMenu()"
-        aria-label="Abrir menú"
+        [attr.aria-label]="menuOpen() ? 'Cerrar menú' : 'Abrir menú'"
         type="button"
       >
-        @if (menuOpen()) { Cerrar } @else { Menú }
+        @if (menuOpen()) {
+          <svg viewBox="0 0 24 24" class="h-5 w-5" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+            <line x1="18" y1="6" x2="6" y2="18" />
+            <line x1="6" y1="6" x2="18" y2="18" />
+          </svg>
+        } @else {
+          <svg viewBox="0 0 24 24" class="h-5 w-5" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+            <line x1="3" y1="6" x2="21" y2="6" />
+            <line x1="3" y1="12" x2="21" y2="12" />
+            <line x1="3" y1="18" x2="21" y2="18" />
+          </svg>
+        }
       </button>
 
       <nav
@@ -125,7 +136,7 @@
                       class="flex cursor-pointer gap-3 border-b border-gold-subtle p-3 hover:bg-cf-surface3"
                       [class.bg-cf-surface3]="!notif.read"
                     >
-                      <img [src]="toAbsoluteUrl(notif.senderId.avatar)" class="h-8 w-8 rounded-sm object-cover shrink-0 border border-gold-subtle" alt="Avatar" />
+                      <img [src]="toAbsoluteUrl(notif.senderId.avatar)" (error)="onAvatarError($event)" class="h-8 w-8 rounded-sm object-cover shrink-0 border border-gold-subtle" alt="Avatar" />
                       <div class="flex-1">
                         <p class="font-body text-sm text-cf-parchment">{{ notif.message }}</p>
                         <p class="font-ui text-[0.65rem] tracking-wide-cf text-cf-parchment-muted">{{ notif.createdAt | date:'dd/MM HH:mm' }}</p>
@@ -146,6 +157,7 @@
             <div class="flex items-center gap-2 px-2" [routerLink]="['/profile']" (click)="closeMenu()">
               <img
                 [src]="toAbsoluteUrl(authService.currentUser()?.avatar)"
+                (error)="onAvatarError($event)"
                 class="h-8 w-8 rounded-sm object-cover border border-gold-subtle"
                 alt="Avatar"
               />

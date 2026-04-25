@@ -22,6 +22,7 @@
             <img
               [src]="resolvedAvatar()"
               [alt]="displayName()"
+              (error)="onAvatarError($event)"
               class="h-32 w-32 rounded-full border-2 border-gold-subtle object-cover"
             />
             @if (isMyProfile()) {

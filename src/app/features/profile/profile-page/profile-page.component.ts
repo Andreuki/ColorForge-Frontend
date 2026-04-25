@@ -12,7 +12,7 @@ import { ForgeBadgeComponent } from '../../../shared/components/forge-badge/forg
 import { getUserDisplayName, getUserId } from '../../../shared/models/user.model';
 import { ToastService } from '../../../shared/services/toast.service';
 import { ProfileService } from '../../../users/services/profile.service';
-import { toAbsoluteUrl } from '../../../shared/utils/url.helper';
+import { toAbsoluteUrl, onAvatarError } from '../../../shared/utils/url.helper';
 
 @Component({
   selector: 'app-profile-page',
@@ -52,6 +52,7 @@ export class ProfilePageComponent {
 
   readonly displayName = computed(() => getUserDisplayName(this.user()));
   readonly userEmail = computed(() => this.user()?.email ?? '');
+  readonly onAvatarError = onAvatarError;
   readonly resolvedAvatar = computed(() => {
     const preview = this.previewAvatarUrl();
     if (preview) return preview;

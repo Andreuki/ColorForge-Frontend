@@ -98,7 +98,7 @@
             <div class="flex items-center gap-3 mb-6">
               @if (authorId()) {
                 <a [routerLink]="authorProfileLink()" class="flex items-center gap-3 group">
-                  <img [src]="toAbsoluteUrl(authorAvatar())" class="w-10 h-10 rounded-full object-cover border border-cf-steel" [alt]="authorUsername()" />
+                  <img [src]="toAbsoluteUrl(authorAvatar())" (error)="onAvatarError($event)" class="w-10 h-10 rounded-full object-cover border border-cf-steel" [alt]="authorUsername()" />
                   <div>
                     <span class="font-heading uppercase tracking-widest hover:text-cf-gold transition-colors text-cf-parchment">{{ authorUsername() }}</span>
                     <p class="text-xs text-cf-parchment-muted">{{ post()?.createdAt | date:'dd/MM/yyyy' }}</p>
@@ -106,7 +106,7 @@
                 </a>
               } @else {
                 <div class="flex items-center gap-3">
-                  <img [src]="toAbsoluteUrl(authorAvatar())" class="w-10 h-10 rounded-full object-cover border border-cf-steel" [alt]="authorUsername()" />
+                  <img [src]="toAbsoluteUrl(authorAvatar())" (error)="onAvatarError($event)" class="w-10 h-10 rounded-full object-cover border border-cf-steel" [alt]="authorUsername()" />
                   <div>
                     <span class="font-heading uppercase tracking-widest text-cf-parchment">{{ authorUsername() }}</span>
                     <p class="text-xs text-cf-parchment-muted">{{ post()?.createdAt | date:'dd/MM/yyyy' }}</p>
@@ -249,7 +249,7 @@
               <div class="bg-cf-surface rounded-sm p-4 border border-gold-subtle">
                 <div class="flex items-start justify-between gap-2 mb-2">
                   <div class="flex items-center gap-2">
-                    <img [src]="toAbsoluteUrl(comment.userId.avatar ?? '')" class="w-8 h-8 rounded-full object-cover border border-cf-steel" [alt]="commentAuthor(comment.userId)" />
+                    <img [src]="toAbsoluteUrl(comment.userId.avatar ?? '')" (error)="onAvatarError($event)" class="w-8 h-8 rounded-full object-cover border border-cf-steel" [alt]="commentAuthor(comment.userId)" />
                     <div>
                       <a [routerLink]="['/user', comment.userId._id]" class="font-heading uppercase tracking-widest text-cf-parchment text-sm hover:text-cf-gold transition-colors cursor-pointer">{{ commentAuthor(comment.userId) }}</a>
                       <p class="text-xs text-cf-parchment-muted">{{ comment.createdAt | date:'dd/MM/yyyy HH:mm' }}</p>
@@ -368,5 +368,68 @@
       (confirmed)="confirmDeleteComment()"
       (cancelled)="cancelDeleteComment()"
     />
+
+    @if (isFullscreen()) {
+      <div
+        class="fixed inset-0 z-[9999] flex items-center justify-center bg-black/90 backdrop-blur-sm"
+        (click)="closeFullscreen()"
+        role="dialog"
+        aria-modal="true"
+        aria-label="Vista ampliada"
+      >
+        <div
+          class="relative flex max-h-screen max-w-[95vw] flex-col items-center"
+          (click)="$event.stopPropagation()"
+        >
+          <button
+            type="button"
+            class="absolute -top-10 right-0 z-10 flex h-9 w-9 items-center justify-center rounded-sm border border-gold-subtle bg-cf-black/70 text-cf-parchment hover:border-cf-gold hover:text-cf-gold transition-colors"
+            (click)="closeFullscreen()"
+            aria-label="Cerrar"
+          >
+            <svg viewBox="0 0 24 24" class="h-5 w-5" fill="none" stroke="currentColor" stroke-width="2">
+              <line x1="18" y1="6" x2="6" y2="18" />
+              <line x1="6" y1="6" x2="18" y2="18" />
+            </svg>
+          </button>
+
+          <img
+            [src]="toAbsoluteUrl(activeImage())"
+            [alt]="post()!.title || 'Miniatura'"
+            class="max-h-[85vh] max-w-full rounded-sm object-contain shadow-2xl"
+          />
+
+          @if ((post()?.imageUrls?.length ?? 0) > 1) {
+            <div class="mt-3 flex items-center gap-3">
+              <button
+                type="button"
+                class="flex h-8 w-8 items-center justify-center rounded-sm border border-gold-subtle bg-cf-black/70 text-cf-parchment hover:border-cf-gold hover:text-cf-gold transition-colors"
+                (click)="navigateFullscreen(-1)"
+                aria-label="Imagen anterior"
+              >
+                <svg viewBox="0 0 24 24" class="h-4 w-4" fill="none" stroke="currentColor" stroke-width="2">
+                  <polyline points="15 18 9 12 15 6" />
+                </svg>
+              </button>
+
+              <span class="font-ui text-xs text-cf-parchment-muted">
+                {{ (post()!.imageUrls!.indexOf(activeImage()!) + 1) }} / {{ post()!.imageUrls!.length }}
+              </span>
+
+              <button
+                type="button"
+                class="flex h-8 w-8 items-center justify-center rounded-sm border border-gold-subtle bg-cf-black/70 text-cf-parchment hover:border-cf-gold hover:text-cf-gold transition-colors"
+                (click)="navigateFullscreen(1)"
+                aria-label="Imagen siguiente"
+              >
+                <svg viewBox="0 0 24 24" class="h-4 w-4" fill="none" stroke="currentColor" stroke-width="2">
+                  <polyline points="9 18 15 12 9 6" />
+                </svg>
+              </button>
+            </div>
+          }
+        </div>
+      </div>
+    }
   </section>
 </app-page-wrapper>

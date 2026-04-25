@@ -5,7 +5,7 @@ import { AuthService } from './core/services/auth.service';
 import { Notification } from './shared/models/notification.model';
 import { ToastContainerComponent } from './shared/components/toast-container/toast-container.component';
 import { NotificationService } from './shared/services/notification.service';
-import { toAbsoluteUrl } from './shared/utils/url.helper';
+import { toAbsoluteUrl, onAvatarError } from './shared/utils/url.helper';
 
 @Component({
   selector: 'app-root',
@@ -25,6 +25,7 @@ export class AppComponent {
   unreadCount = signal(0);
   showNotifications = signal(false);
   readonly toAbsoluteUrl = toAbsoluteUrl;
+  readonly onAvatarError = onAvatarError;
 
   // Estado del menú hamburguesa en móvil
   menuOpen = signal(false);
