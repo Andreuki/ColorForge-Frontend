@@ -2,27 +2,6 @@
   <section class="mx-auto max-w-7xl px-6 py-6">
     <app-section-title title="Panel de Administración" subtitle="Control integral de comunidad, contenido y análisis" />
 
-    @if (stats()) {
-      <div class="grid grid-cols-1 md:grid-cols-4 gap-4 mb-8">
-        <article class="bg-cf-surface2 border border-gold-subtle rounded-sm p-5 hover:border-gold-hover hover:shadow-gold-sm transition-all duration-200">
-          <p class="font-ui text-[0.68rem] tracking-widest-cf uppercase text-cf-parchment-muted mb-1">Usuarios</p>
-          <p class="font-display text-2xl text-cf-gold">{{ stats().totalUsers }}</p>
-        </article>
-        <article class="bg-cf-surface2 border border-gold-subtle rounded-sm p-5 hover:border-gold-hover hover:shadow-gold-sm transition-all duration-200">
-          <p class="font-ui text-[0.68rem] tracking-widest-cf uppercase text-cf-parchment-muted mb-1">Publicaciones</p>
-          <p class="font-display text-2xl text-cf-gold">{{ stats().totalPosts }}</p>
-        </article>
-        <article class="bg-cf-surface2 border border-gold-subtle rounded-sm p-5 hover:border-gold-hover hover:shadow-gold-sm transition-all duration-200">
-          <p class="font-ui text-[0.68rem] tracking-widest-cf uppercase text-cf-parchment-muted mb-1">Análisis</p>
-          <p class="font-display text-2xl text-cf-gold">{{ stats().totalAnalyses }}</p>
-        </article>
-        <article class="bg-cf-surface2 border border-gold-subtle rounded-sm p-5 hover:border-gold-hover hover:shadow-gold-sm transition-all duration-200">
-          <p class="font-ui text-[0.68rem] tracking-widest-cf uppercase text-cf-parchment-muted mb-1">Comentarios</p>
-          <p class="font-display text-2xl text-cf-gold">{{ stats().totalComments }}</p>
-        </article>
-      </div>
-    }
-
     <div class="flex gap-2 mb-6 border-b border-gold-subtle">
       @for (tab of tabs; track tab.id) {
         <button
@@ -37,6 +16,107 @@
         </button>
       }
     </div>
+
+    @if (activeTab() === 'stats') {
+      @if (statsLoading()) {
+        <div class="bg-cf-surface2 border border-gold-subtle rounded-sm p-5 hover:border-gold-hover hover:shadow-gold-sm transition-all duration-200">
+          <p class="text-center opacity-60 py-8">Cargando estadísticas...</p>
+        </div>
+      }
+
+      @if (statsError() && !statsLoading()) {
+        <p class="text-center text-red-500 py-8">
+          No se pudieron cargar las estadísticas.
+          <button (click)="loadStats()" class="underline">Reintentar</button>
+        </p>
+      }
+
+      @if (stats() && !statsLoading()) {
+        <div class="grid grid-cols-1 md:grid-cols-4 gap-4 mb-8">
+          <article class="bg-cf-surface2 border border-gold-subtle rounded-sm p-5 hover:border-gold-hover hover:shadow-gold-sm transition-all duration-200">
+            <p class="font-ui text-[0.68rem] tracking-widest-cf uppercase text-cf-parchment-muted mb-1">Usuarios</p>
+            <p class="font-display text-2xl text-cf-gold">{{ stats()?.users?.total ?? stats()?.totalUsers ?? 0 }}</p>
+          </article>
+          <article class="bg-cf-surface2 border border-gold-subtle rounded-sm p-5 hover:border-gold-hover hover:shadow-gold-sm transition-all duration-200">
+            <p class="font-ui text-[0.68rem] tracking-widest-cf uppercase text-cf-parchment-muted mb-1">Publicaciones</p>
+            <p class="font-display text-2xl text-cf-gold">{{ stats()?.posts?.total ?? stats()?.totalPosts ?? 0 }}</p>
+          </article>
+          <article class="bg-cf-surface2 border border-gold-subtle rounded-sm p-5 hover:border-gold-hover hover:shadow-gold-sm transition-all duration-200">
+            <p class="font-ui text-[0.68rem] tracking-widest-cf uppercase text-cf-parchment-muted mb-1">Retos completados</p>
+            <p class="font-display text-2xl text-cf-gold">{{ stats()?.challenges?.completed ?? 0 }}</p>
+          </article>
+          <article class="bg-cf-surface2 border border-gold-subtle rounded-sm p-5 hover:border-gold-hover hover:shadow-gold-sm transition-all duration-200">
+            <p class="font-ui text-[0.68rem] tracking-widest-cf uppercase text-cf-parchment-muted mb-1">Participaciones en retos</p>
+            <p class="font-display text-2xl text-cf-gold">{{ stats()?.challenges?.totalParticipations ?? 0 }}</p>
+          </article>
+        </div>
+
+        <div class="bg-cf-surface2 border border-gold-subtle rounded-sm p-5 hover:border-gold-hover hover:shadow-gold-sm transition-all duration-200 mb-6">
+          <h3 class="font-heading text-[0.72rem] tracking-widest-cf uppercase text-cf-gold mb-3">Actividad reciente</h3>
+          <div class="grid grid-cols-1 md:grid-cols-2 gap-4 text-sm">
+            <div>
+              <p class="font-semibold text-cf-parchment-dim">Nuevos usuarios</p>
+              <p class="text-cf-parchment-muted">Esta semana: <strong>{{ stats()?.users?.newLast7Days ?? 0 }}</strong></p>
+              <p class="text-cf-parchment-muted">Este mes: <strong>{{ stats()?.users?.newLast30Days ?? 0 }}</strong></p>
+            </div>
+            <div>
+              <p class="font-semibold text-cf-parchment-dim">Nuevas publicaciones</p>
+              <p class="text-cf-parchment-muted">Esta semana: <strong>{{ stats()?.posts?.newLast7Days ?? 0 }}</strong></p>
+              <p class="text-cf-parchment-muted">Este mes: <strong>{{ stats()?.posts?.newLast30Days ?? 0 }}</strong></p>
+            </div>
+          </div>
+        </div>
+
+        <div class="bg-cf-surface2 border border-gold-subtle rounded-sm p-5 hover:border-gold-hover hover:shadow-gold-sm transition-all duration-200 mb-6">
+          <h3 class="font-heading text-[0.72rem] tracking-widest-cf uppercase text-cf-gold mb-3">Distribución por Tier</h3>
+          @for (tier of (stats()?.users?.byTier ?? []); track tier.tier) {
+            <div class="flex items-center gap-3 mb-2">
+              <span class="w-24 text-sm truncate text-cf-parchment-dim">{{ tier.tier || 'Sin tier' }}</span>
+              <div class="flex-1 bg-gray-200 dark:bg-gray-700 rounded h-2">
+                <div
+                  class="h-2 rounded bg-cf-gold"
+                  [style.width.%]="(stats()?.users?.total ? (tier.count / stats()?.users?.total) * 100 : 0)"
+                ></div>
+              </div>
+              <span class="text-sm w-8 text-right text-cf-parchment-dim">{{ tier.count }}</span>
+            </div>
+          }
+        </div>
+
+        <div class="bg-cf-surface2 border border-gold-subtle rounded-sm p-5 hover:border-gold-hover hover:shadow-gold-sm transition-all duration-200 mb-6">
+          <h3 class="font-heading text-[0.72rem] tracking-widest-cf uppercase text-cf-gold mb-3">Top 5 usuarios</h3>
+          <div class="w-full overflow-x-auto border border-gold-subtle bg-cf-surface2 rounded-sm">
+            <table class="w-full border-collapse font-ui text-sm">
+              <thead class="border-b border-gold-subtle">
+                <tr>
+                  <th class="text-cf-gold font-heading text-[0.68rem] tracking-widest-cf uppercase px-4 py-3 text-left">Usuario</th>
+                  <th class="text-cf-gold font-heading text-[0.68rem] tracking-widest-cf uppercase px-4 py-3 text-left">ForgeScore</th>
+                  <th class="text-cf-gold font-heading text-[0.68rem] tracking-widest-cf uppercase px-4 py-3 text-left">Tier</th>
+                </tr>
+              </thead>
+              <tbody>
+                @for (user of (stats()?.topUsers ?? []); track user._id) {
+                  <tr class="border-b border-[rgba(200,146,42,0.08)] hover:bg-cf-surface3 transition-colors duration-150">
+                    <td class="px-4 py-3 text-cf-parchment-dim">
+                      <div class="flex items-center gap-2">
+                        @if (user.avatar) {
+                          <img [src]="user.avatar" class="w-6 h-6 rounded-full object-cover" alt="Avatar" />
+                        }
+                        <a [routerLink]="['/profile', user._id]" class="text-cf-gold hover:underline transition-colors">
+                          {{ user.username }}
+                        </a>
+                      </div>
+                    </td>
+                    <td class="px-4 py-3 text-cf-parchment-dim">{{ user.forgeScore }}</td>
+                    <td class="px-4 py-3 text-cf-parchment-dim">{{ user.forgeTier }}</td>
+                  </tr>
+                }
+              </tbody>
+            </table>
+          </div>
+        </div>
+      }
+    }
 
     @if (activeTab() === 'users') {
       <div class="flex flex-wrap items-center gap-3 mb-4">

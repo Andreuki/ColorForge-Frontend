@@ -43,6 +43,7 @@ export class PostCreateComponent implements OnInit {
   ngOnInit(): void {
     this.#challengeService.getActive().subscribe({
       next: (res) => this.activeChallenge.set(res.data ?? null),
+      error: () => this.activeChallenge.set(null),
     });
 
     const postId = this.id();

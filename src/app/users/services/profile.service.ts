@@ -100,4 +100,10 @@ export class ProfileService {
       )
       .pipe(map((res) => res.data ?? []));
   }
+
+  unfollowUser(userId: string): Observable<void> {
+    return this.#http.delete<void>(`${environment.apiUrl}/api/users/${userId}/follow`, {
+      headers: this.#noCacheHeaders,
+    });
+  }
 }

@@ -4,91 +4,294 @@
 
     <div class="flex gap-2 mb-6 border-b border-gold-subtle">
       <button
-        (click)="activeTab.set('inventory')"
+        (click)="activeTab = 'inventory'"
         class="font-heading text-[0.72rem] tracking-widest-cf uppercase px-4 py-2 border-b-2 transition"
-        [class.border-cf-gold]="activeTab() === 'inventory'"
-        [class.text-cf-gold]="activeTab() === 'inventory'"
-        [class.border-transparent]="activeTab() !== 'inventory'"
-        [class.text-cf-parchment-dim]="activeTab() !== 'inventory'"
+        [class.border-cf-gold]="activeTab === 'inventory'"
+        [class.text-cf-gold]="activeTab === 'inventory'"
+        [class.border-transparent]="activeTab !== 'inventory'"
+        [class.text-cf-parchment-dim]="activeTab !== 'inventory'"
       >
-        Mi inventario ({{ inventory().length }})
+        Mi inventario ({{ userPaints.length }})
       </button>
       <button
-        (click)="activeTab.set('catalog')"
+        (click)="activeTab = 'catalog'"
         class="font-heading text-[0.72rem] tracking-widest-cf uppercase px-4 py-2 border-b-2 transition"
-        [class.border-cf-gold]="activeTab() === 'catalog'"
-        [class.text-cf-gold]="activeTab() === 'catalog'"
-        [class.border-transparent]="activeTab() !== 'catalog'"
-        [class.text-cf-parchment-dim]="activeTab() !== 'catalog'"
+        [class.border-cf-gold]="activeTab === 'catalog'"
+        [class.text-cf-gold]="activeTab === 'catalog'"
+        [class.border-transparent]="activeTab !== 'catalog'"
+        [class.text-cf-parchment-dim]="activeTab !== 'catalog'"
       >
-        Catalogo completo
+        Buscar y añadir
       </button>
     </div>
 
-    <div class="flex flex-wrap items-center gap-3 mb-6">
-      <input type="text" placeholder="Buscar pintura..." [value]="search()" (input)="search.set($any($event.target).value); loadCatalog()" class="bg-cf-surface border border-gold-subtle rounded-sm text-cf-parchment font-body text-base px-4 py-2.5 w-full md:w-auto md:flex-1 min-w-[220px] placeholder:text-cf-parchment-muted focus:outline-none focus:border-cf-gold focus:ring-2 focus:ring-[rgba(200,146,42,0.1)] transition-all duration-200" />
+    @if (activeTab === 'catalog') {
+      <div class="bg-cf-surface2 border border-gold-subtle rounded-sm p-4 hover:border-gold-hover hover:shadow-gold-sm transition-all duration-200 mb-6">
+        <h3 class="font-heading text-cf-parchment text-[0.9rem] mb-3">Añadir pintura al maletín</h3>
 
-      <select [value]="brandFilter()" (change)="brandFilter.set($any($event.target).value); loadCatalog()" class="bg-cf-surface border border-gold-subtle rounded-sm text-cf-parchment font-ui text-sm tracking-wide-cf uppercase px-4 py-2.5 appearance-none cursor-pointer focus:outline-none focus:border-cf-gold transition-all duration-200">
-        <option value="">Todas las marcas</option>
-        <option>Citadel</option>
-        <option>Vallejo</option>
-        <option>Army Painter</option>
-        <option>AK Interactive</option>
-      </select>
+        <div class="flex gap-2 mb-2">
+          <select
+            [(ngModel)]="selectedBrand"
+            (change)="onSearchInput()"
+            class="bg-cf-surface border border-gold-subtle rounded-sm text-cf-parchment font-ui text-sm tracking-wide-cf uppercase px-4 py-2.5 appearance-none cursor-pointer focus:outline-none focus:border-cf-gold transition-all duration-200"
+          >
+            <option value="">Todas las marcas</option>
+            @for (brand of catalog; track brand.name) {
+              <option [value]="brand.name">{{ brand.name }}</option>
+            }
+          </select>
 
-      <select [value]="typeFilter()" (change)="typeFilter.set($any($event.target).value); loadCatalog()" class="bg-cf-surface border border-gold-subtle rounded-sm text-cf-parchment font-ui text-sm tracking-wide-cf uppercase px-4 py-2.5 appearance-none cursor-pointer focus:outline-none focus:border-cf-gold transition-all duration-200">
-        <option value="">Todos los tipos</option>
-        <option>Base</option>
-        <option>Shade</option>
-        <option>Layer</option>
-        <option>Contrast</option>
-        <option>Technical</option>
-      </select>
-    </div>
+          <div class="flex-1 relative">
+            <input
+              type="text"
+              [(ngModel)]="searchTerm"
+              (input)="onSearchInput()"
+              placeholder="Buscar pintura (ej: Mephiston Red...)"
+              class="bg-cf-surface border border-gold-subtle rounded-sm text-cf-parchment font-body text-base px-4 py-2.5 w-full min-w-[220px] placeholder:text-cf-parchment-muted focus:outline-none focus:border-cf-gold focus:ring-2 focus:ring-[rgba(200,146,42,0.1)] transition-all duration-200"
+              autocomplete="off"
+            />
 
-    @if (activeTab() === 'catalog') {
-      <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
-        @for (paint of catalog(); track paint._id) {
-          <article class="bg-cf-surface2 border border-gold-subtle rounded-sm p-4 hover:border-gold-hover hover:shadow-gold-sm transition-all duration-200">
-            <div class="flex items-center gap-3">
-              <div class="w-8 h-8 rounded-full border border-cf-steel flex-shrink-0" [style.background-color]="paint.hex"></div>
-              <div class="flex-1 min-w-0">
-                <p class="font-heading text-cf-parchment text-[0.9rem] truncate">{{ paint.name }}</p>
-                <p class="font-ui text-[0.72rem] tracking-wide-cf uppercase text-cf-parchment-muted">{{ paint.brand }} {{ paint.type }}</p>
+            @if (showDropdown) {
+              <div class="absolute top-full left-0 right-0 z-20 mt-1 bg-cf-surface2 border border-gold-subtle rounded-sm shadow-card max-h-64 overflow-y-auto">
+                @for (result of filteredResults; track result.name + result.brandName) {
+                  <button
+                    type="button"
+                    (click)="addFromCatalog(result)"
+                    [disabled]="addingPaint"
+                    class="w-full flex items-center gap-3 px-3 py-2 text-left hover:bg-cf-surface3 transition-colors duration-150"
+                  >
+                    <div class="w-5 h-5 rounded shrink-0 border border-cf-steel" [style.background]="result.hex"></div>
+                    <div class="flex-1 min-w-0">
+                      <p class="text-sm font-heading text-cf-parchment truncate">{{ result.name }}</p>
+                      <p class="font-ui text-[0.72rem] tracking-wide-cf uppercase text-cf-parchment-muted">
+                        {{ result.brandName }} · {{ result.line }}
+                      </p>
+                    </div>
+                    <span class="text-xs text-cf-gold shrink-0">+ Añadir</span>
+                  </button>
+                }
+
+                @if (filteredResults.length === 0 && searchTerm.length >= 2) {
+                  <button
+                    type="button"
+                    (click)="showCustomForm = true; customPaint.name = searchTerm; showDropdown = false"
+                    class="w-full px-3 py-2 text-left text-sm text-cf-gold hover:bg-cf-surface3"
+                  >
+                    + Añadir "{{ searchTerm }}" como pintura personalizada
+                  </button>
+                }
               </div>
-              <button (click)="togglePaint(paint)" class="border border-[rgba(200,146,42,0.3)] text-cf-parchment-dim font-heading text-[0.72rem] tracking-widest-cf uppercase px-3 py-1.5 rounded-sm hover:border-cf-gold hover:text-cf-gold active:scale-95 transition-all duration-200">
-                {{ hasPaint(paint) ? 'En inventario' : 'Añadir' }}
+            }
+          </div>
+        </div>
+
+        @if (showCustomForm) {
+          <div class="bg-cf-surface border border-gold-subtle mt-3 p-4 rounded-sm">
+            <p class="text-sm font-semibold text-cf-parchment mb-3">Añadir pintura personalizada</p>
+            <div class="grid grid-cols-2 gap-3">
+              <input
+                type="text"
+                [(ngModel)]="customPaint.name"
+                placeholder="Nombre de la pintura"
+                class="bg-cf-surface border border-gold-subtle rounded-sm text-cf-parchment font-body text-base px-4 py-2.5 col-span-2 placeholder:text-cf-parchment-muted focus:outline-none focus:border-cf-gold focus:ring-2 focus:ring-[rgba(200,146,42,0.1)] transition-all duration-200"
+              />
+              <input
+                type="text"
+                [(ngModel)]="customPaint.brand"
+                placeholder="Marca"
+                class="bg-cf-surface border border-gold-subtle rounded-sm text-cf-parchment font-body text-base px-4 py-2.5 placeholder:text-cf-parchment-muted focus:outline-none focus:border-cf-gold focus:ring-2 focus:ring-[rgba(200,146,42,0.1)] transition-all duration-200"
+              />
+              <div class="flex items-center gap-2">
+                <input
+                  type="color"
+                  [(ngModel)]="customPaint.hexColor"
+                  class="w-10 h-10 rounded-sm cursor-pointer border border-gold-subtle bg-cf-surface p-0.5"
+                />
+                <input
+                  type="text"
+                  [(ngModel)]="customPaint.hexColor"
+                  placeholder="#000000"
+                  maxlength="7"
+                  class="bg-cf-surface border border-gold-subtle rounded-sm text-cf-parchment font-body text-base px-4 py-2.5 flex-1 font-mono placeholder:text-cf-parchment-muted focus:outline-none focus:border-cf-gold focus:ring-2 focus:ring-[rgba(200,146,42,0.1)] transition-all duration-200"
+                />
+              </div>
+              <input
+                type="text"
+                [(ngModel)]="customPaint.notes"
+                placeholder="Notas (opcional)"
+                class="bg-cf-surface border border-gold-subtle rounded-sm text-cf-parchment font-body text-base px-4 py-2.5 col-span-2 placeholder:text-cf-parchment-muted focus:outline-none focus:border-cf-gold focus:ring-2 focus:ring-[rgba(200,146,42,0.1)] transition-all duration-200"
+              />
+            </div>
+
+            <div class="flex gap-2 mt-3">
+              <button
+                (click)="addCustomPaint()"
+                [disabled]="addingPaint || !customPaint.name || !customPaint.brand"
+                class="bg-gradient-to-br from-cf-gold to-cf-gold-dim text-cf-black font-heading rounded-sm px-4 py-2 hover:shadow-gold-lg uppercase text-sm tracking-widest disabled:opacity-50"
+              >
+                {{ addingPaint ? 'Añadiendo...' : 'Añadir al maletín' }}
+              </button>
+              <button
+                (click)="showCustomForm = false; customPaint = { name: '', brand: '', hexColor: '#000000', notes: '' }"
+                class="border border-[rgba(200,146,42,0.3)] text-cf-parchment-dim font-heading text-[0.72rem] tracking-widest-cf uppercase px-3 py-1.5 rounded-sm hover:border-cf-gold hover:text-cf-gold active:scale-95 transition-all duration-200"
+              >
+                Cancelar
               </button>
             </div>
-          </article>
+          </div>
         }
       </div>
+
+      @if (!catalogLoaded) {
+        <p class="text-cf-parchment-muted text-sm">Cargando catálogo...</p>
+      }
     }
 
-    @if (activeTab() === 'inventory') {
-      @if (!inventory().length) {
+    @if (activeTab === 'inventory') {
+      <div class="bg-cf-surface2 border border-gold-subtle rounded-sm p-4 hover:border-gold-hover hover:shadow-gold-sm transition-all duration-200 mb-6">
+        <h3 class="font-heading text-cf-parchment text-[0.9rem] mb-3">Añadir pintura al maletín</h3>
+
+        <div class="flex gap-2 mb-2">
+          <select
+            [(ngModel)]="selectedBrand"
+            (change)="onSearchInput()"
+            class="bg-cf-surface border border-gold-subtle rounded-sm text-cf-parchment font-ui text-sm tracking-wide-cf uppercase px-4 py-2.5 appearance-none cursor-pointer focus:outline-none focus:border-cf-gold transition-all duration-200"
+          >
+            <option value="">Todas las marcas</option>
+            @for (brand of catalog; track brand.name) {
+              <option [value]="brand.name">{{ brand.name }}</option>
+            }
+          </select>
+
+          <div class="flex-1 relative">
+            <input
+              type="text"
+              [(ngModel)]="searchTerm"
+              (input)="onSearchInput()"
+              placeholder="Buscar pintura (ej: Mephiston Red...)"
+              class="bg-cf-surface border border-gold-subtle rounded-sm text-cf-parchment font-body text-base px-4 py-2.5 w-full min-w-[220px] placeholder:text-cf-parchment-muted focus:outline-none focus:border-cf-gold focus:ring-2 focus:ring-[rgba(200,146,42,0.1)] transition-all duration-200"
+              autocomplete="off"
+            />
+
+            @if (showDropdown) {
+              <div class="absolute top-full left-0 right-0 z-20 mt-1 bg-cf-surface2 border border-gold-subtle rounded-sm shadow-card max-h-64 overflow-y-auto">
+                @for (result of filteredResults; track result.name + result.brandName) {
+                  <button
+                    type="button"
+                    (click)="addFromCatalog(result)"
+                    [disabled]="addingPaint"
+                    class="w-full flex items-center gap-3 px-3 py-2 text-left hover:bg-cf-surface3 transition-colors duration-150"
+                  >
+                    <div class="w-5 h-5 rounded shrink-0 border border-cf-steel" [style.background]="result.hex"></div>
+                    <div class="flex-1 min-w-0">
+                      <p class="text-sm font-heading text-cf-parchment truncate">{{ result.name }}</p>
+                      <p class="font-ui text-[0.72rem] tracking-wide-cf uppercase text-cf-parchment-muted">
+                        {{ result.brandName }} · {{ result.line }}
+                      </p>
+                    </div>
+                    <span class="text-xs text-cf-gold shrink-0">+ Añadir</span>
+                  </button>
+                }
+
+                @if (filteredResults.length === 0 && searchTerm.length >= 2) {
+                  <button
+                    type="button"
+                    (click)="showCustomForm = true; customPaint.name = searchTerm; showDropdown = false"
+                    class="w-full px-3 py-2 text-left text-sm text-cf-gold hover:bg-cf-surface3"
+                  >
+                    + Añadir "{{ searchTerm }}" como pintura personalizada
+                  </button>
+                }
+              </div>
+            }
+          </div>
+        </div>
+
+        @if (showCustomForm) {
+          <div class="bg-cf-surface border border-gold-subtle mt-3 p-4 rounded-sm">
+            <p class="text-sm font-semibold text-cf-parchment mb-3">Añadir pintura personalizada</p>
+            <div class="grid grid-cols-2 gap-3">
+              <input
+                type="text"
+                [(ngModel)]="customPaint.name"
+                placeholder="Nombre de la pintura"
+                class="bg-cf-surface border border-gold-subtle rounded-sm text-cf-parchment font-body text-base px-4 py-2.5 col-span-2 placeholder:text-cf-parchment-muted focus:outline-none focus:border-cf-gold focus:ring-2 focus:ring-[rgba(200,146,42,0.1)] transition-all duration-200"
+              />
+              <input
+                type="text"
+                [(ngModel)]="customPaint.brand"
+                placeholder="Marca"
+                class="bg-cf-surface border border-gold-subtle rounded-sm text-cf-parchment font-body text-base px-4 py-2.5 placeholder:text-cf-parchment-muted focus:outline-none focus:border-cf-gold focus:ring-2 focus:ring-[rgba(200,146,42,0.1)] transition-all duration-200"
+              />
+              <div class="flex items-center gap-2">
+                <input
+                  type="color"
+                  [(ngModel)]="customPaint.hexColor"
+                  class="w-10 h-10 rounded-sm cursor-pointer border border-gold-subtle bg-cf-surface p-0.5"
+                />
+                <input
+                  type="text"
+                  [(ngModel)]="customPaint.hexColor"
+                  placeholder="#000000"
+                  maxlength="7"
+                  class="bg-cf-surface border border-gold-subtle rounded-sm text-cf-parchment font-body text-base px-4 py-2.5 flex-1 font-mono placeholder:text-cf-parchment-muted focus:outline-none focus:border-cf-gold focus:ring-2 focus:ring-[rgba(200,146,42,0.1)] transition-all duration-200"
+                />
+              </div>
+              <input
+                type="text"
+                [(ngModel)]="customPaint.notes"
+                placeholder="Notas (opcional)"
+                class="bg-cf-surface border border-gold-subtle rounded-sm text-cf-parchment font-body text-base px-4 py-2.5 col-span-2 placeholder:text-cf-parchment-muted focus:outline-none focus:border-cf-gold focus:ring-2 focus:ring-[rgba(200,146,42,0.1)] transition-all duration-200"
+              />
+            </div>
+
+            <div class="flex gap-2 mt-3">
+              <button
+                (click)="addCustomPaint()"
+                [disabled]="addingPaint || !customPaint.name || !customPaint.brand"
+                class="bg-gradient-to-br from-cf-gold to-cf-gold-dim text-cf-black font-heading rounded-sm px-4 py-2 hover:shadow-gold-lg uppercase text-sm tracking-widest disabled:opacity-50"
+              >
+                {{ addingPaint ? 'Añadiendo...' : 'Añadir al maletín' }}
+              </button>
+              <button
+                (click)="showCustomForm = false; customPaint = { name: '', brand: '', hexColor: '#000000', notes: '' }"
+                class="border border-[rgba(200,146,42,0.3)] text-cf-parchment-dim font-heading text-[0.72rem] tracking-widest-cf uppercase px-3 py-1.5 rounded-sm hover:border-cf-gold hover:text-cf-gold active:scale-95 transition-all duration-200"
+              >
+                Cancelar
+              </button>
+            </div>
+          </div>
+        }
+      </div>
+
+      @if (!userPaints.length) {
         <div class="text-center py-20">
           <div class="text-cf-gold-dim text-2xl">?</div>
-          <p class="font-body italic text-cf-parchment-muted text-lg mt-3">Tu maletin esta vacio.</p>
+          <p class="font-body italic text-cf-parchment-muted text-lg mt-3">Tu maletin está vacío. ¡Busca pinturas arriba para empezar!</p>
         </div>
       } @else {
         <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
-          @for (item of inventory(); track item.paintId?._id ?? item.paintId) {
+          @for (paint of userPaints; track paintId(paint)) {
             <article class="bg-cf-surface2 border border-gold-subtle rounded-sm p-4 hover:border-gold-hover hover:shadow-gold-sm transition-all duration-200">
               <div class="flex items-center gap-3">
-                <div class="w-8 h-8 rounded-full border border-cf-steel flex-shrink-0" [style.background-color]="item.paintId?.hex ?? '#888'"></div>
+                <div class="w-8 h-8 rounded-full border border-cf-steel flex-shrink-0" [style.background-color]="paintHexColor(paint)"></div>
                 <div class="flex-1 min-w-0">
-                  <p class="font-heading text-cf-parchment text-[0.9rem] truncate">{{ item.paintId?.name }}</p>
-                  <p class="font-ui text-[0.72rem] tracking-wide-cf uppercase text-cf-parchment-muted">{{ item.paintId?.brand }}</p>
+                  <div class="flex items-center gap-2">
+                    <p class="font-heading text-cf-parchment text-[0.9rem] truncate">{{ paintName(paint) }}</p>
+                    @if (paint.isCustom) {
+                      <span class="text-xs px-1.5 py-0.5 rounded bg-cf-surface border border-gold-subtle text-cf-gold">Custom</span>
+                    }
+                  </div>
+                  <p class="font-ui text-[0.72rem] tracking-wide-cf uppercase text-cf-parchment-muted">{{ paintBrand(paint) }}</p>
                 </div>
 
-                <select (change)="updateStatus(item.paintId?._id, $any($event.target).value)" [value]="item.status" class="bg-cf-surface border border-gold-subtle rounded-sm text-cf-parchment font-ui text-[0.72rem] tracking-wide-cf uppercase px-2 py-1 appearance-none cursor-pointer focus:outline-none focus:border-cf-gold transition-all duration-200">
-                  <option value="Full">Lleno</option>
-                  <option value="Low">Casi vacio</option>
-                  <option value="Empty">Vacio</option>
-                </select>
-
-                <button (click)="togglePaint(item.paintId)" class="border border-cf-crimson text-cf-parchment font-heading text-[0.72rem] tracking-widest-cf uppercase px-3 py-1.5 rounded-sm hover:bg-cf-crimson active:scale-95 transition-all duration-200">Quitar</button>
+                <button
+                  (click)="deletePaint(paintId(paint), paintName(paint))"
+                  [disabled]="deletingIds.has(paintId(paint))"
+                  class="border border-cf-crimson text-cf-parchment font-heading text-[0.72rem] tracking-widest-cf uppercase px-3 py-1.5 rounded-sm hover:bg-cf-crimson active:scale-95 transition-all duration-200 text-xs shrink-0 disabled:opacity-60"
+                >
+                  {{ deletingIds.has(paintId(paint)) ? '...' : 'Eliminar' }}
+                </button>
               </div>
             </article>
           }

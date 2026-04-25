@@ -50,22 +50,24 @@
                 [routerLink]="['/user', id() ?? user()?._id, 'followers']"
                 class="text-cf-gold hover:text-cf-gold-light transition-colors"
               >
-                Seguidores ({{ user()?.followers?.length ?? 0 }})
+                Seguidores ({{ resolvedFollowersCount() }})
               </a>
               <a
                 [routerLink]="['/user', id() ?? user()?._id, 'following']"
                 class="text-cf-gold hover:text-cf-gold-light transition-colors"
               >
-                Siguiendo ({{ user()?.following?.length ?? 0 }})
+                Siguiendo ({{ resolvedFollowingCount() }})
               </a>
             </div>
-            <a
-              [routerLink]="['/analyses']"
-              [queryParams]="{ userId: analysesLink() }"
-              class="mt-4 inline-flex text-sm font-heading uppercase tracking-widest text-cf-gold hover:text-cf-gold-light"
-            >
-              Ver análisis del usuario
-            </a>
+            @if (isMyProfile()) {
+              <a
+                [routerLink]="['/analyses']"
+                [queryParams]="{ userId: analysesLink() }"
+                class="mt-4 inline-flex text-sm font-heading uppercase tracking-widest text-cf-gold hover:text-cf-gold-light"
+              >
+                Ver análisis del usuario
+              </a>
+            }
 
             @if (user()) {
               <div class="mt-4 p-4 bg-cf-surface rounded-sm border border-gold-subtle">
@@ -107,6 +109,23 @@
               (click)="openEdit('password')"
             >
               Cambiar contraseña
+            </button>
+          </div>
+        } @else {
+          <div class="flex w-full flex-col gap-3 md:w-auto">
+            <button
+              type="button"
+              (click)="toggleFollow()"
+              [disabled]="followLoading()"
+              class="rounded-sm bg-cf-gold px-4 py-2 text-sm font-heading uppercase tracking-widest text-cf-black hover:bg-cf-gold-light disabled:opacity-60"
+            >
+              @if (followLoading()) {
+                Cargando...
+              } @else if (isFollowing()) {
+                Siguiendo
+              } @else {
+                Seguir
+              }
             </button>
           </div>
         }

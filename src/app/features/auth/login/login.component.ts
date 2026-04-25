@@ -58,7 +58,7 @@ export class LoginComponent implements OnInit {
   passwordError = computed(() => {
     const password = this.model().password;
     if (!password) return 'La contrasena es obligatoria.';
-    return password.length >= 8 ? null : 'Minimo 8 caracteres.';
+    return null;
   });
 
   formInvalid = computed(() => !!this.emailError() || !!this.passwordError());

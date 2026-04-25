@@ -251,7 +251,7 @@
                   <div class="flex items-center gap-2">
                     <img [src]="toAbsoluteUrl(comment.userId.avatar ?? '')" class="w-8 h-8 rounded-full object-cover border border-cf-steel" [alt]="commentAuthor(comment.userId)" />
                     <div>
-                      <p class="font-heading uppercase tracking-widest text-cf-parchment text-sm">{{ commentAuthor(comment.userId) }}</p>
+                      <a [routerLink]="['/user', comment.userId._id]" class="font-heading uppercase tracking-widest text-cf-parchment text-sm hover:text-cf-gold transition-colors cursor-pointer">{{ commentAuthor(comment.userId) }}</a>
                       <p class="text-xs text-cf-parchment-muted">{{ comment.createdAt | date:'dd/MM/yyyy HH:mm' }}</p>
                     </div>
                   </div>

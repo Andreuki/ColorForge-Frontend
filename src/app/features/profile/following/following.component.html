@@ -11,10 +11,23 @@
     } @else {
       <div class="grid grid-cols-1 sm:grid-cols-2 gap-3">
         @for (user of following(); track user._id) {
-          <a [routerLink]="['/user', user._id]" class="flex items-center gap-3 rounded-lg bg-[#111] border border-[#2a2a1a] p-3 hover:border-[#C8922A] transition-colors">
-            <img [src]="toAbsoluteUrl(user.avatar)" class="h-10 w-10 rounded-full object-cover" [alt]="user.username || user.name" />
-            <span class="font-semibold">{{ user.username || user.name }}</span>
-          </a>
+          <div class="flex items-center gap-3 rounded-lg bg-[#111] border border-[#2a2a2a] p-3 hover:border-[#C8922A] transition-colors">
+            <a [routerLink]="['/user', user._id]" class="flex min-w-0 flex-1 items-center gap-3">
+              <img [src]="toAbsoluteUrl(user.avatar)" class="h-10 w-10 rounded-full object-cover" [alt]="user.username || user.name" />
+              <span class="min-w-0 truncate font-semibold">{{ user.username || user.name }}</span>
+            </a>
+
+            @if (isOwnProfile()) {
+              <button
+                type="button"
+                (click)="unfollowUser(user._id)"
+                [disabled]="unfollowingIds.has(user._id)"
+                class="border border-gold-subtle text-cf-parchment-dim px-4 py-2 rounded-sm font-heading uppercase text-sm hover:border-cf-gold disabled:opacity-50 disabled:cursor-not-allowed"
+              >
+                {{ unfollowingIds.has(user._id) ? 'Dejando...' : 'Dejar de seguir' }}
+              </button>
+            }
+          </div>
         }
       </div>
     }

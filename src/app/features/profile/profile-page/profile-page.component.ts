@@ -39,6 +39,9 @@ export class ProfilePageComponent {
   });
 
   previewAvatarUrl = signal<string | null>(null);
+  isFollowing = signal(false);
+  followLoading = signal(false);
+  followersDisplayCount = signal(0);
 
   isMyProfile = computed(() => {
     const routeId = this.profileId();
@@ -59,6 +62,12 @@ export class ProfilePageComponent {
     const idFromProfile = this.profileId();
     const fallback = getUserId(this.user());
     return idFromProfile ?? fallback;
+  });
+
+  readonly resolvedFollowersCount = computed(() => this.followersDisplayCount());
+
+  readonly resolvedFollowingCount = computed(() => {
+    return this.user()?.following?.length ?? 0;
   });
 
   readonly forgeTier = computed(() => {
@@ -106,6 +115,40 @@ export class ProfilePageComponent {
 
     effect(() => {
       this.userPostsState.set(this.userPosts());
+    });
+
+    effect(() => {
+      const profile = this.user() as any;
+      const fromCount = Number(profile?.followersCount);
+      if (Number.isFinite(fromCount)) {
+        this.followersDisplayCount.set(fromCount);
+        return;
+      }
+
+      if (Array.isArray(profile?.followers)) {
+        this.followersDisplayCount.set(profile.followers.length);
+        return;
+      }
+
+      this.followersDisplayCount.set(0);
+    });
+
+    effect(() => {
+      if (this.isMyProfile()) {
+        this.isFollowing.set(false);
+        return;
+      }
+
+      const profile = this.user() as any;
+      if (typeof profile?.isFollowing === 'boolean') {
+        this.isFollowing.set(profile.isFollowing);
+        return;
+      }
+
+      const me = this.#auth.currentUser();
+      const targetId = this.profileUserId();
+      const following = (me?.following ?? []).map((id) => String(id));
+      this.isFollowing.set(!!targetId && following.includes(String(targetId)));
     });
   }
 
@@ -186,6 +229,50 @@ export class ProfilePageComponent {
     const owner =
       typeof post.userId === 'object' ? String(post.userId._id ?? post.userId.id ?? '') : String(post.userId);
     return me !== '' && me === owner;
+  }
+
+  toggleFollow(): void {
+    if (this.isMyProfile() || this.followLoading()) return;
+
+    const targetId = this.profileUserId();
+    if (!targetId) return;
+
+    this.followLoading.set(true);
+
+    const onSuccess = () => {
+      const nextFollowing = !this.isFollowing();
+      this.isFollowing.set(nextFollowing);
+      this.followersDisplayCount.update((count) => Math.max(0, count + (nextFollowing ? 1 : -1)));
+
+      const me = this.#auth.currentUser();
+      if (me) {
+        const current = (me.following ?? []).map((id) => String(id));
+        const updated = nextFollowing
+          ? Array.from(new Set([...current, String(targetId)]))
+          : current.filter((id) => id !== String(targetId));
+        this.#auth.patchCurrentUser({ following: updated });
+      }
+
+      this.followLoading.set(false);
+    };
+
+    const onError = (err: unknown) => {
+      console.error('Error al seguir/dejar de seguir:', err);
+      this.followLoading.set(false);
+    };
+
+    if (this.isFollowing()) {
+      this.#profileService.unfollowUser(targetId).subscribe({
+        next: onSuccess,
+        error: onError,
+      });
+      return;
+    }
+
+    this.#postService.followUser(targetId).subscribe({
+      next: onSuccess,
+      error: onError,
+    });
   }
 
   readonly toAbsoluteUrl = toAbsoluteUrl;

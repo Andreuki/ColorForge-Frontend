@@ -1,0 +1,69 @@
+{
+  "brands": [
+    {
+      "name": "Citadel",
+      "lines": ["Base", "Layer", "Shade", "Contrast", "Technical", "Dry", "Air", "Spray"],
+      "paints": [
+        { "name": "Abaddon Black", "line": "Base", "hex": "#1C1C1C" },
+        { "name": "Mephiston Red", "line": "Base", "hex": "#721B17" },
+        { "name": "Macragge Blue", "line": "Base", "hex": "#1D3D6B" },
+        { "name": "Averland Sunset", "line": "Base", "hex": "#D4861E" },
+        { "name": "Caliban Green", "line": "Base", "hex": "#1A4228" },
+        { "name": "Rakarth Flesh", "line": "Base", "hex": "#BAA48C" },
+        { "name": "Retributor Armour", "line": "Base", "hex": "#B8860B" },
+        { "name": "Chaos Black", "line": "Spray", "hex": "#111111" },
+        { "name": "Nuln Oil", "line": "Shade", "hex": "#1A1A2E" },
+        { "name": "Agrax Earthshade", "line": "Shade", "hex": "#3D2B1A" },
+        { "name": "Reikland Fleshshade", "line": "Shade", "hex": "#7A4030" },
+        { "name": "Eshin Grey", "line": "Layer", "hex": "#4A4A52" },
+        { "name": "Ulthuan Grey", "line": "Layer", "hex": "#C8D8D8" },
+        { "name": "Blood Angels Red", "line": "Contrast", "hex": "#8B1A1A" },
+        { "name": "Leadbelcher", "line": "Base", "hex": "#5C5C5C" },
+        { "name": "Ironbreaker", "line": "Layer", "hex": "#7A7A7A" },
+        { "name": "Corax White", "line": "Base", "hex": "#EDEDED" },
+        { "name": "Khorne Red", "line": "Base", "hex": "#5A1010" }
+      ]
+    },
+    {
+      "name": "Vallejo",
+      "lines": ["Model Color", "Game Color", "Mecha Color", "Air"],
+      "paints": [
+        { "name": "Black (Model Color)", "line": "Model Color", "hex": "#1A1A1A" },
+        { "name": "White (Model Color)", "line": "Model Color", "hex": "#F5F5F5" },
+        { "name": "Flat Red", "line": "Model Color", "hex": "#A0201A" },
+        { "name": "Prussian Blue", "line": "Model Color", "hex": "#1B3A5C" },
+        { "name": "German Fieldgrey WWII", "line": "Model Color", "hex": "#5B6757" },
+        { "name": "Dead White (Game Color)", "line": "Game Color", "hex": "#F0F0F0" },
+        { "name": "Bloody Red (Game Color)", "line": "Game Color", "hex": "#BE1E2D" },
+        { "name": "Magic Blue (Game Color)", "line": "Game Color", "hex": "#2060A0" },
+        { "name": "Gunmetal Grey", "line": "Model Color", "hex": "#4B4F54" },
+        { "name": "Bronze", "line": "Model Color", "hex": "#8A6A3C" }
+      ]
+    },
+    {
+      "name": "Army Painter",
+      "lines": ["Warpaints Fanatic", "Speedpaint", "Primer"],
+      "paints": [
+        { "name": "Matt Black", "line": "Warpaints Fanatic", "hex": "#1A1A1A" },
+        { "name": "Matt White", "line": "Warpaints Fanatic", "hex": "#F0F0F0" },
+        { "name": "Gorgon Hide", "line": "Warpaints Fanatic", "hex": "#8B7355" },
+        { "name": "Daemonic Yellow", "line": "Speedpaint", "hex": "#D4A017" },
+        { "name": "Runic Grey", "line": "Speedpaint", "hex": "#6B7280" },
+        { "name": "Zealot Yellow", "line": "Speedpaint", "hex": "#D9A11E" },
+        { "name": "Slaughter Red", "line": "Speedpaint", "hex": "#8F1D1D" }
+      ]
+    },
+    {
+      "name": "Scale75",
+      "lines": ["Scale Color", "Instant Colors", "Fantasy & Games"],
+      "paints": [
+        { "name": "Black", "line": "Scale Color", "hex": "#111111" },
+        { "name": "White", "line": "Scale Color", "hex": "#F2F2F2" },
+        { "name": "Antares Red", "line": "Scale Color", "hex": "#991B1B" },
+        { "name": "Cobalt", "line": "Scale Color", "hex": "#1E40AF" },
+        { "name": "Boreal Green", "line": "Fantasy & Games", "hex": "#1F5F46" },
+        { "name": "Tenere Yellow", "line": "Fantasy & Games", "hex": "#D9A31A" }
+      ]
+    }
+  ]
+}

@@ -2,6 +2,7 @@ import {
   ChangeDetectionStrategy,
   Component,
   DestroyRef,
+  effect,
   inject,
   signal,
 } from '@angular/core';
@@ -41,7 +42,9 @@ export class AdminPanelComponent {
   ];
 
   // Stats
-  stats = signal<any>(null);
+  stats = signal<any | null>(null);
+  statsLoading = signal(false);
+  statsError = signal(false);
 
   // Users
   users = signal<any[]>([]);
@@ -77,22 +80,42 @@ export class AdminPanelComponent {
   private searchTimer: any;
 
   constructor() {
-    this.loadStats();
     this.loadUsers();
     this.loadPosts();
     this.loadAnalyses();
     this.loadChallenges();
+
+    effect(() => {
+      if (this.activeTab() === 'stats' && !this.stats() && !this.statsLoading()) {
+        this.loadStats();
+      }
+    });
   }
 
   setActiveTab(tab: AdminTab): void {
     this.activeTab.set(tab);
+    if (tab === 'stats' && !this.stats() && !this.statsLoading()) {
+      this.loadStats();
+    }
   }
 
   loadStats(): void {
+    this.statsLoading.set(true);
+    this.statsError.set(false);
     this.#adminService
       .getStats()
       .pipe(takeUntilDestroyed(this.#destroyRef))
-      .subscribe((data) => this.stats.set(data));
+      .subscribe({
+        next: (data) => {
+          this.stats.set(data);
+          this.statsLoading.set(false);
+        },
+        error: (err) => {
+          console.error('Error cargando estadísticas:', err);
+          this.statsLoading.set(false);
+          this.statsError.set(true);
+        },
+      });
   }
 
   loadUsers(page = 1): void {

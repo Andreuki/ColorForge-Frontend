@@ -41,6 +41,14 @@
           >
             Ranking
           </a>
+          <a
+            routerLink="/challenges"
+            routerLinkActive="text-cf-gold border-b-2 border-cf-gold pb-0.5"
+            (click)="closeMenu()"
+            class="font-heading text-[0.72rem] uppercase tracking-widest-cf text-cf-parchment-dim transition-colors duration-200 hover:text-cf-gold px-2 py-1"
+          >
+            Retos
+          </a>
 
           @if (currentUser()) {
             <a
