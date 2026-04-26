@@ -28,6 +28,7 @@ export class PostCreateComponent implements OnInit {
   privacy = signal<'public' | 'followers' | 'private'>('public');
   joinChallenge = signal(false);
   activeChallenge = signal<any>(null);
+  challengeLoaded = signal(false);
 
   title = signal('');
   description = signal('');
@@ -42,8 +43,14 @@ export class PostCreateComponent implements OnInit {
 
   ngOnInit(): void {
     this.#challengeService.getActive().subscribe({
-      next: (res) => this.activeChallenge.set(res.data ?? null),
-      error: () => this.activeChallenge.set(null),
+      next: (res) => {
+        this.activeChallenge.set(res.data ?? null);
+        this.challengeLoaded.set(true);
+      },
+      error: () => {
+        this.activeChallenge.set(null);
+        this.challengeLoaded.set(true);
+      },
     });
 
     const postId = this.id();
