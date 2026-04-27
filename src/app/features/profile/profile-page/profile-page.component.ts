@@ -1,4 +1,4 @@
-import { ChangeDetectionStrategy, Component, computed, effect, inject, input, resource, signal, untracked } from '@angular/core';
+import { ChangeDetectionStrategy, Component, OnInit, computed, effect, inject, input, resource, signal, untracked } from '@angular/core';
 import { DecimalPipe } from '@angular/common';
 import { Router, RouterLink } from '@angular/router';
 import { firstValueFrom } from 'rxjs';
@@ -21,7 +21,7 @@ import { toAbsoluteUrl, onAvatarError } from '../../../shared/utils/url.helper';
   templateUrl: './profile-page.component.html',
   changeDetection: ChangeDetectionStrategy.OnPush,
 })
-export class ProfilePageComponent {
+export class ProfilePageComponent implements OnInit {
   #auth = inject(AuthService);
   #postService = inject(PostService);
   #router = inject(Router);
@@ -29,7 +29,15 @@ export class ProfilePageComponent {
   #toast = inject(ToastService);
 
   id = input<number | string | undefined>(undefined);
-  profileId = computed(() => this.id());
+  profileId = computed(() => {
+    const routeId = this.id();
+    if (routeId !== undefined && routeId !== null && routeId !== '') {
+      return routeId;
+    }
+    // Para perfil propio: usar el _id del usuario autenticado como request.
+    // Esto evita que el resource Angular 19 entre en estado "idle".
+    return getUserId(this.#auth.currentUser()) || undefined;
+  });
   profileResource = this.#profileService.getProfileResource(this.profileId);
   user = computed(() => {
     if (this.id()) {
@@ -42,6 +50,23 @@ export class ProfilePageComponent {
   isFollowing = signal(false);
   followLoading = signal(false);
   followersDisplayCount = signal(0);
+
+  // Resource dedicado para contar seguidores y siguiendo en tiempo real.
+  // No depende de user() para evitar datos desactualizados.
+  #countsResource = resource({
+    request: () => ({ userId: this.profileUserId() }),
+    loader: async ({ request }) => {
+      if (!request.userId) return { followersCount: 0, followingCount: 0 };
+      const [followers, following] = await Promise.all([
+        firstValueFrom(this.#profileService.getFollowers(request.userId)),
+        firstValueFrom(this.#profileService.getFollowing(request.userId)),
+      ]);
+      return {
+        followersCount: followers.length,
+        followingCount: following.length,
+      };
+    },
+  });
 
   isMyProfile = computed(() => {
     const routeId = this.profileId();
@@ -65,9 +90,17 @@ export class ProfilePageComponent {
     return idFromProfile ?? fallback;
   });
 
-  readonly resolvedFollowersCount = computed(() => this.followersDisplayCount());
+  readonly resolvedFollowersCount = computed(() => {
+    // Prioridad: valor del resource dedicado (fresco de API).
+    // Fallback: followersDisplayCount para las actualizaciones optimistas de toggleFollow.
+    const fromApi = this.#countsResource.value()?.followersCount;
+    if (fromApi !== undefined) return fromApi;
+    return this.followersDisplayCount();
+  });
 
   readonly resolvedFollowingCount = computed(() => {
+    const fromApi = this.#countsResource.value()?.followingCount;
+    if (fromApi !== undefined) return fromApi;
     return this.user()?.following?.length ?? 0;
   });
 
@@ -152,6 +185,8 @@ export class ProfilePageComponent {
       this.isFollowing.set(!!targetId && following.includes(String(targetId)));
     });
   }
+
+  ngOnInit(): void {}
 
   openEdit(view: 'profile' | 'password'): void {
     this.#router.navigate(['/profile/edit'], { queryParams: { view } });
@@ -254,6 +289,7 @@ export class ProfilePageComponent {
         this.#auth.patchCurrentUser({ following: updated });
       }
 
+      this.#countsResource.reload();
       this.followLoading.set(false);
     };
 

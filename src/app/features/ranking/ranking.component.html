@@ -6,50 +6,27 @@
     />
 
     @if (activeChallenge()) {
-      <section class="w-full overflow-hidden border border-gold-subtle bg-cf-surface2 rounded-sm shadow-card p-4 mb-8">
-        <div class="flex items-center justify-between mb-4 gap-4">
-          <div>
-            <h2 class="font-heading text-[0.9rem] tracking-widest-cf uppercase text-cf-gold">
-              Reto Activo: {{ activeChallenge().title }}
-            </h2>
-            <p class="font-ui text-[0.75rem] tracking-wide-cf text-cf-parchment-muted mt-1">
-              Termina el {{ activeChallenge().endDate | date:'dd/MM/yyyy' }} ·
-              {{ challengePosts().length }} participaciones
-            </p>
-          </div>
-          <a
-            [routerLink]="['/challenges', activeChallenge()._id]"
-            class="font-heading text-[0.72rem] uppercase tracking-widest-cf text-cf-parchment-dim transition-colors duration-200 hover:text-cf-gold px-2 py-1"
-          >
-            Ver todas →
-          </a>
+      <a
+        [routerLink]="['/challenges', activeChallenge()._id]"
+        class="mb-8 flex items-center justify-between gap-4 border border-gold-subtle bg-cf-surface2 px-5 py-3 rounded-sm shadow-card hover:border-cf-gold transition-all duration-200"
+      >
+        <div class="flex items-center gap-3 min-w-0">
+          <span class="shrink-0 font-ui text-[0.68rem] uppercase tracking-widest-cf text-cf-gold border border-cf-gold/40 px-2 py-0.5 rounded-sm">
+            Reto Activo
+          </span>
+          <span class="font-heading text-[0.9rem] tracking-wide-cf text-cf-parchment truncate">
+            {{ activeChallenge().title }}
+          </span>
         </div>
-
-        @if (challengePosts().length > 0) {
-          <div class="grid grid-cols-2 sm:grid-cols-4 gap-3">
-            @for (post of challengePosts().slice(0, 4); track post._id) {
-              <a [routerLink]="['/posts', post._id]" class="cursor-pointer group">
-                <div class="aspect-square overflow-hidden rounded-sm bg-cf-surface3 border border-gold-subtle">
-                  <img
-                    [src]="toAbsoluteUrl(post.imageUrl || post.imageUrls?.[0])"
-                    [alt]="post.title || 'Participación'"
-                    class="w-full h-full object-cover group-hover:scale-105 transition-transform"
-                  />
-                </div>
-                <p class="text-xs mt-1 truncate opacity-70 text-cf-parchment-dim">
-                  {{ post.author?.username || post.userId?.username || 'CFUSER' }}
-                </p>
-              </a>
-            }
-          </div>
-        } @else {
-          <div class="w-full overflow-x-auto border border-gold-subtle bg-cf-surface2 rounded-sm text-center py-6">
-            <p class="text-sm opacity-60 text-cf-parchment-muted">
-              Aún no hay participaciones. ¡Sube una publicación y únete al reto!
-            </p>
-          </div>
-        }
-      </section>
+        <div class="flex items-center gap-4 shrink-0">
+          <span class="hidden sm:inline font-ui text-[0.72rem] text-cf-parchment-muted">
+            {{ challengePosts().length }} participaciones · Termina el {{ activeChallenge().endDate | date:'dd/MM/yyyy' }}
+          </span>
+          <span class="font-heading text-[0.72rem] uppercase tracking-widest-cf text-cf-parchment-dim hover:text-cf-gold transition-colors duration-200 whitespace-nowrap">
+            Ver todas →
+          </span>
+        </div>
+      </a>
     }
 
     <div class="w-full overflow-x-auto border border-gold-subtle bg-cf-surface2 rounded-sm shadow-card">

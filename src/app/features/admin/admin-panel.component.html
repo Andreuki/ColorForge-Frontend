@@ -255,8 +255,151 @@
     @if (activeTab() === 'challenges') {
       <div class="mb-4 flex items-center justify-between gap-4">
         <p class="font-body text-sm text-cf-parchment-muted">Retos disponibles y finalizados.</p>
-        <span class="font-ui text-[0.68rem] uppercase tracking-widest-cf text-cf-parchment-muted">{{ challenges().length }} resultados</span>
+        <div class="flex items-center gap-3">
+          <span class="font-ui text-[0.68rem] uppercase tracking-widest-cf text-cf-parchment-muted">
+            {{ challenges().length }} resultados
+          </span>
+          <button
+            type="button"
+            (click)="openCreateChallenge()"
+            class="border border-cf-gold text-cf-gold font-heading text-[0.72rem] tracking-widest-cf uppercase px-3 py-1.5 rounded-sm hover:bg-cf-gold hover:text-cf-black active:scale-95 transition-all duration-200"
+          >
+            + Nuevo Reto
+          </button>
+        </div>
       </div>
+
+      <!-- Formulario crear / editar reto -->
+      @if (showChallengeForm()) {
+        <div class="mb-6 border border-gold-subtle bg-cf-surface2 rounded-sm p-5">
+          <h3 class="font-heading text-[0.85rem] tracking-widest-cf uppercase text-cf-gold mb-4">
+            {{ challengeFormMode() === 'create' ? 'Nuevo Reto' : 'Editar Reto' }}
+          </h3>
+
+          <div class="grid grid-cols-1 gap-4 md:grid-cols-2">
+            <!-- Título -->
+            <div class="flex flex-col gap-1 md:col-span-2">
+              <label class="font-ui text-[0.68rem] tracking-widest-cf uppercase text-cf-parchment-muted">
+                Título *
+              </label>
+              <input
+                type="text"
+                [value]="cfTitle()"
+                (input)="cfTitle.set($any($event.target).value)"
+                maxlength="100"
+                placeholder="Título del reto"
+                class="w-full rounded-sm border border-gold-subtle bg-cf-surface px-3 py-2 font-ui text-sm text-cf-parchment placeholder-cf-parchment-muted focus:border-cf-gold focus:outline-none"
+              />
+            </div>
+
+            <!-- Descripción -->
+            <div class="flex flex-col gap-1 md:col-span-2">
+              <label class="font-ui text-[0.68rem] tracking-widest-cf uppercase text-cf-parchment-muted">
+                Descripción *
+              </label>
+              <textarea
+                [value]="cfDescription()"
+                (input)="cfDescription.set($any($event.target).value)"
+                maxlength="500"
+                rows="3"
+                placeholder="Describe el reto..."
+                class="w-full rounded-sm border border-gold-subtle bg-cf-surface px-3 py-2 font-ui text-sm text-cf-parchment placeholder-cf-parchment-muted focus:border-cf-gold focus:outline-none resize-none"
+              ></textarea>
+            </div>
+
+            <!-- Fecha inicio -->
+            <div class="flex flex-col gap-1">
+              <label class="font-ui text-[0.68rem] tracking-widest-cf uppercase text-cf-parchment-muted">
+                Fecha inicio *
+              </label>
+              <input
+                type="date"
+                [value]="cfStartDate()"
+                (input)="cfStartDate.set($any($event.target).value)"
+                class="w-full rounded-sm border border-gold-subtle bg-cf-surface px-3 py-2 font-ui text-sm text-cf-parchment focus:border-cf-gold focus:outline-none"
+              />
+            </div>
+
+            <!-- Fecha fin -->
+            <div class="flex flex-col gap-1">
+              <label class="font-ui text-[0.68rem] tracking-widest-cf uppercase text-cf-parchment-muted">
+                Fecha fin *
+              </label>
+              <input
+                type="date"
+                [value]="cfEndDate()"
+                (input)="cfEndDate.set($any($event.target).value)"
+                class="w-full rounded-sm border border-gold-subtle bg-cf-surface px-3 py-2 font-ui text-sm text-cf-parchment focus:border-cf-gold focus:outline-none"
+              />
+            </div>
+
+            <!-- Badge -->
+            <div class="flex flex-col gap-1">
+              <label class="font-ui text-[0.68rem] tracking-widest-cf uppercase text-cf-parchment-muted">
+                Badge (texto del trofeo)
+              </label>
+              <input
+                type="text"
+                [value]="cfBadge()"
+                (input)="cfBadge.set($any($event.target).value)"
+                placeholder="Ej: 🏆 Campeón del Smoke Challenge"
+                class="w-full rounded-sm border border-gold-subtle bg-cf-surface px-3 py-2 font-ui text-sm text-cf-parchment placeholder-cf-parchment-muted focus:border-cf-gold focus:outline-none"
+              />
+            </div>
+
+            <!-- Imagen de portada (solo en crear) -->
+            @if (true) {
+              <div class="flex flex-col gap-1">
+                <label class="font-ui text-[0.68rem] tracking-widest-cf uppercase text-cf-parchment-muted">
+                  Imagen de portada
+                </label>
+                <input
+                  type="file"
+                  accept="image/*"
+                  (change)="onCfImageSelected($event)"
+                  class="w-full rounded-sm border border-gold-subtle bg-cf-surface px-3 py-2 font-ui text-sm text-cf-parchment file:mr-3 file:border-0 file:bg-transparent file:font-ui file:text-xs file:text-cf-gold file:uppercase file:tracking-wide-cf cursor-pointer"
+                />
+              </div>
+            }
+
+            <!-- Preview imagen -->
+            @if (cfImagePreview()) {
+              <div class="md:col-span-2">
+                <img
+                  [src]="cfImagePreview()!"
+                  alt="Preview"
+                  class="h-32 w-full rounded-sm object-cover border border-gold-subtle"
+                />
+              </div>
+            }
+          </div>
+
+          <!-- Error -->
+          @if (cfError()) {
+            <p class="mt-3 font-ui text-xs text-cf-crimson">{{ cfError() }}</p>
+          }
+
+          <!-- Botones -->
+          <div class="mt-4 flex gap-3 justify-end">
+            <button
+              type="button"
+              (click)="closeChallengeForm()"
+              [disabled]="cfLoading()"
+              class="border border-gold-subtle text-cf-parchment-dim font-heading text-[0.72rem] tracking-widest-cf uppercase px-4 py-1.5 rounded-sm hover:border-cf-gold hover:text-cf-gold active:scale-95 transition-all duration-200 disabled:opacity-50"
+            >
+              Cancelar
+            </button>
+            <button
+              type="button"
+              (click)="submitChallengeForm()"
+              [disabled]="cfLoading()"
+              class="border border-cf-gold bg-cf-gold/10 text-cf-gold font-heading text-[0.72rem] tracking-widest-cf uppercase px-4 py-1.5 rounded-sm hover:bg-cf-gold hover:text-cf-black active:scale-95 transition-all duration-200 disabled:opacity-50"
+            >
+              {{ cfLoading() ? 'Guardando...' : (challengeFormMode() === 'create' ? 'Crear Reto' : 'Guardar Cambios') }}
+            </button>
+          </div>
+        </div>
+      }
 
       <div class="w-full overflow-x-auto border border-gold-subtle bg-cf-surface2 rounded-sm">
         <table class="w-full border-collapse font-ui text-sm">
@@ -277,11 +420,35 @@
                     <p class="text-cf-parchment-dim font-ui text-[0.85rem] tracking-wide">{{ itemTitle(challenge) }}</p>
                   </div>
                 </td>
-                <td class="text-cf-parchment-dim px-4 py-3 font-ui text-[0.85rem] tracking-wide uppercase">{{ challenge.isActive ? 'Activo' : 'Finalizado' }}</td>
+                <td class="px-4 py-3">
+                  <span
+                    class="font-ui text-[0.75rem] tracking-wide-cf uppercase px-2 py-0.5 rounded-sm border"
+                    [class]="challenge.isActive
+                      ? 'border-cf-gold/40 text-cf-gold bg-cf-gold/5'
+                      : 'border-gold-subtle text-cf-parchment-muted'"
+                  >
+                    {{ challenge.isActive ? 'Activo' : 'Finalizado' }}
+                  </span>
+                </td>
                 <td class="text-cf-parchment-dim px-4 py-3 font-ui text-[0.85rem] tracking-wide">{{ challenge.startDate | date:'dd/MM/yyyy' }} - {{ challenge.endDate | date:'dd/MM/yyyy' }}</td>
                 <td class="px-4 py-3">
-                  <div class="flex gap-2">
+                  <div class="flex flex-wrap gap-2">
                     <a [routerLink]="['/challenges', itemId(challenge)]" class="border border-[rgba(200,146,42,0.3)] text-cf-parchment-dim font-heading text-[0.72rem] tracking-widest-cf uppercase px-3 py-1.5 rounded-sm hover:border-cf-gold hover:text-cf-gold active:scale-95 transition-all duration-200">Ver</a>
+                    <button
+                      type="button"
+                      (click)="openEditChallenge(challenge)"
+                      class="border border-[rgba(200,146,42,0.3)] text-cf-parchment-dim font-heading text-[0.72rem] tracking-widest-cf uppercase px-3 py-1.5 rounded-sm hover:border-cf-gold hover:text-cf-gold active:scale-95 transition-all duration-200"
+                    >Editar</button>
+                    <button
+                      type="button"
+                      (click)="toggleChallengeActive(challenge)"
+                      class="font-heading text-[0.72rem] tracking-widest-cf uppercase px-3 py-1.5 rounded-sm border active:scale-95 transition-all duration-200"
+                      [class]="challenge.isActive
+                        ? 'border-cf-parchment-muted/40 text-cf-parchment-muted hover:border-cf-parchment-dim hover:text-cf-parchment-dim'
+                        : 'border-cf-gold/40 text-cf-gold hover:border-cf-gold hover:bg-cf-gold/10'"
+                    >
+                      {{ challenge.isActive ? 'Desactivar' : 'Activar' }}
+                    </button>
                     <button (click)="confirmDelete(itemId(challenge), 'challenge')" class="border border-cf-crimson text-cf-parchment font-heading text-[0.72rem] tracking-widest-cf uppercase px-3 py-1.5 rounded-sm hover:bg-cf-crimson active:scale-95 transition-all duration-200">Eliminar</button>
                   </div>
                 </td>
