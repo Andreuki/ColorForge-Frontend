@@ -160,6 +160,11 @@ div[aria-hidden="true"] {
   background-image: linear-gradient(180deg, rgba(255, 252, 241, 0.06), rgba(255, 252, 241, 0));
 }
 
+[data-theme="light"] app-page-wrapper section {
+  background-color: transparent !important;
+  background-image: none !important;
+}
+
 [data-theme="light"] [class*="border-[rgba(200,146,42"] {
   border-color: var(--cf-t-border) !important;
 }
