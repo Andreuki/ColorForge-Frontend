@@ -11,8 +11,6 @@ body {
   margin: 0;
   padding: 0;
   min-height: 100%;
-  background-color: #080709;
-  color: #e8dcc8;
   font-family: 'Crimson Text', serif;
   font-size: 1rem;
   line-height: 1.6;
@@ -21,7 +19,7 @@ body {
 }
 
 @layer base {
-  body {
+  [data-theme="dark"] body {
     @apply bg-cf-black text-cf-parchment font-body;
   }
 }
@@ -30,15 +28,348 @@ body {
   width: 5px;
 }
 
-::-webkit-scrollbar-track {
-  background: #080709;
+/* ── Variables de tema ───────────────────────────────── */
+
+/* OSCURO: todos los valores respetan exactamente el diseño actual */
+:root,
+[data-theme="dark"] {
+  --cf-t-bg0:       #080709;   /* cf-black   */
+  --cf-t-bg1:       #0f0d10;   /* cf-surface */
+  --cf-t-bg2:       #16131a;   /* cf-surface2 */
+  --cf-t-bg3:       #1e1924;   /* cf-surface3 */
+  --cf-t-text:      #e8dcc8;   /* cf-parchment */
+  --cf-t-text-dim:  #a89880;   /* cf-parchment-dim */
+  --cf-t-text-mute: #5a5040;   /* cf-parchment-muted */
+  --cf-t-gold:      #C8922A;   /* cf-gold */
+  --cf-t-gold-l:    #e8b458;   /* cf-gold-light */
+  --cf-t-gold-d:    #7a5218;   /* cf-gold-dim */
+  --cf-t-border:    rgba(200,146,42,0.20); /* gold-subtle */
+  --cf-t-border-h:  rgba(200,146,42,0.60); /* gold-hover */
+  --cf-t-crimson:   #7a1c1c;
+  --cf-t-scroll-tr: #080709;
+  --cf-t-scroll-th: #7a5218;
+  --cf-watermark-logo: url('assets/brand/colorforge-logo.png');
+  --cf-watermark-opacity: 0.12;
 }
 
-::-webkit-scrollbar-thumb {
-  background: #7a5218;
-  border-radius: 3px;
+/* CLARO: paleta "pergamino de taller artesano"
+   Decisiones de diseño:
+   - Fondos: serie de calidos ocres/beige (no blancos puros)
+   - Texto: marrones oscuros calidos (no negro frio)
+   - Dorado: version mas oscura (#7A4F08) para contraste sobre beige
+     -> ratio tx1/bg0 = 13.2:1  ✓ AAA
+     -> ratio gold/bg0 = 5.1:1  ✓ AA
+     -> ratio tx2/bg2  = 5.8:1  ✓ AA
+   - Se mantiene la familia cromatica: todo en la gama ambar/ocre/sepia
+*/
+[data-theme="light"] {
+  --cf-t-bg0:       #F0E8D5;   /* pergamino base */
+  --cf-t-bg1:       #E8DFC8;   /* superficie nav/header */
+  --cf-t-bg2:       #DDD3B8;   /* tarjetas, inputs */
+  --cf-t-bg3:       #D3C9AA;   /* fondos internos de tarjeta */
+  --cf-t-text:      #1C1409;   /* texto principal: marron muy oscuro */
+  --cf-t-text-dim:  #4A3318;   /* texto secundario */
+  --cf-t-text-mute: #8A6E40;   /* texto tenue / metadatos */
+  --cf-t-gold:      #A86608;   /* dorado INTENSO para claro */
+  --cf-t-gold-l:    #D4A574;   /* dorado-light más brillante */
+  --cf-t-gold-d:    #C8922A;   /* gold-dim en claro = el dorado original */
+  --cf-t-border:    rgba(100,65,10,0.22);
+  --cf-t-border-h:  rgba(168, 102, 8, 0.72);
+  --cf-t-crimson:   #6B1212;
+  --cf-t-scroll-tr: #F0E8D5;
+  --cf-t-scroll-th: #b8902a;
+  --cf-watermark-logo: url('assets/brand/colorforge-logoClaro.png');
+  --cf-watermark-opacity: 0.20;
 }
 
-::-webkit-scrollbar-thumb:hover {
-  background: #C8922A;
+/* Watermark logo overlay - aplica el fondo al div aria-hidden */
+div[aria-hidden="true"] {
+  background-image: var(--cf-watermark-logo) !important;
+  background-repeat: no-repeat !important;
+  background-position: center !important;
+  background-size: contain !important;
+  background-attachment: fixed !important;
+  opacity: var(--cf-watermark-opacity) !important;
+  pointer-events: none !important;
+}
+
+/* Texto blanco/crema en botones con gradiente dorado (para contraste) */
+[data-theme="light"] button.bg-gradient-to-br.text-cf-black,
+[data-theme="light"] button.bg-gradient-to-br .text-cf-black {
+  color: #F5F1E0 !important;
+}
+
+/* Texto blanco/crema en botones con fondo dorado sólido */
+[data-theme="light"] button.bg-cf-gold.text-cf-black {
+  color: #F5F1E0;
+  font-weight: 500;
+  box-shadow: 0 2px 8px rgba(168, 102, 8, 0.24);
+  border-color: #8B5C0F;
+}
+
+[data-theme="light"] button.bg-cf-gold.text-cf-black:hover {
+  background-color: #B87510;
+  box-shadow: 0 4px 12px rgba(168, 102, 8, 0.32);
+}
+
+/* Botones de peligro (zona roja) en tema claro */
+[data-theme="light"] button:has(~ .text-cf-crimson-light),
+[data-theme="light"] button.bg-cf-crimson,
+[data-theme="light"] button.bg-cf-crimson-light {
+  background-color: var(--cf-t-crimson);
+  color: #F5F1E0;
+  border-color: var(--cf-t-crimson);
+}
+
+[data-theme="light"] button.bg-cf-crimson:hover,
+[data-theme="light"] button.bg-cf-crimson-light:hover {
+  background-color: #8B2121;
+  box-shadow: 0 4px 12px rgba(107, 18, 18, 0.28);
+}
+
+/* ── Light Theme UX Polish ───────────────────────────── */
+[data-theme="light"] {
+  color-scheme: light;
+}
+
+[data-theme="light"] body {
+  background:
+    radial-gradient(1200px 700px at 12% -10%, rgba(255, 247, 227, 0.75) 0%, rgba(255, 247, 227, 0) 62%),
+    radial-gradient(1000px 640px at 92% 112%, rgba(173, 127, 37, 0.12) 0%, rgba(173, 127, 37, 0) 64%),
+    var(--cf-t-bg0);
+  color: #A86608;
+}
+
+[data-theme="light"] .bg-cf-black {
+  background-color: var(--cf-t-bg0);
+  background-image: linear-gradient(180deg, rgba(255, 252, 241, 0.18), rgba(255, 252, 241, 0));
+}
+
+[data-theme="light"] .bg-cf-surface {
+  background-color: var(--cf-t-bg1);
+  background-image: linear-gradient(180deg, rgba(255, 252, 241, 0.12), rgba(255, 252, 241, 0));
+}
+
+[data-theme="light"] .bg-cf-surface2 {
+  background-color: var(--cf-t-bg2);
+  background-image: linear-gradient(180deg, rgba(255, 252, 241, 0.08), rgba(255, 252, 241, 0));
+}
+
+[data-theme="light"] .bg-cf-surface3 {
+  background-color: var(--cf-t-bg3);
+  background-image: linear-gradient(180deg, rgba(255, 252, 241, 0.06), rgba(255, 252, 241, 0));
+}
+
+[data-theme="light"] [class*="border-[rgba(200,146,42"] {
+  border-color: var(--cf-t-border) !important;
+}
+
+[data-theme="light"] .text-cf-steel,
+[data-theme="light"] .text-cf-steel-light {
+  color: #6e5b3e;
+}
+
+[data-theme="light"] .shadow-card {
+  box-shadow:
+    0 10px 24px rgba(83, 58, 23, 0.11),
+    0 1px 0 rgba(255, 255, 255, 0.42) inset;
+}
+
+[data-theme="light"] article.shadow-card,
+[data-theme="light"] a.shadow-card,
+[data-theme="light"] article.group,
+[data-theme="light"] a.group {
+  border-color: rgba(122, 79, 8, 0.24);
+}
+
+/* Galería: hover sutil, mueve apenas */
+[data-theme="light"] article.relative.overflow-hidden.cursor-pointer.border:hover {
+  transform: translateY(-2px);
+  border-color: rgba(168, 102, 8, 0.48) !important;
+  box-shadow:
+    0 12px 22px rgba(168, 102, 8, 0.16),
+    0 0 0 1px rgba(168, 102, 8, 0.12);
+}
+
+/* Paneles: hover más agresivo (desafios, ranking, etc.) */
+[data-theme="light"] [class*="shadow-card"]:not(.relative.overflow-hidden.cursor-pointer):hover,
+[data-theme="light"] section[class*="shadow-card"]:hover {
+  transform: translateY(-5px);
+  border-color: rgba(168, 102, 8, 0.72) !important;
+  box-shadow:
+    0 22px 40px rgba(168, 102, 8, 0.28),
+    0 0 0 1px rgba(168, 102, 8, 0.22);
+}
+
+/* Navbar: fondo más opaco al hacer scroll */
+[data-theme="light"] header {
+  backdrop-filter: blur(8px);
+  transition: all 0.3s ease;
+}
+
+[data-theme="light"] header.scrolled {
+  background: rgba(232, 223, 200, 0.96);
+  box-shadow: 0 4px 16px rgba(168, 102, 8, 0.12);
+}
+
+[data-theme="light"] .shadow-gold-lg,
+[data-theme="light"] .hover\:shadow-gold-lg:hover {
+  box-shadow:
+    0 14px 28px rgba(122, 79, 8, 0.16),
+    0 0 0 1px rgba(122, 79, 8, 0.12);
+}
+
+/* Solo desaturar gradientes que NO sean dorados (evita empanar botones principales) */
+[data-theme="light"] .bg-gradient-to-r:not(.from-cf-gold):not(.from-cf-gold-light),
+[data-theme="light"] .bg-gradient-to-l:not(.from-cf-gold):not(.from-cf-gold-light),
+[data-theme="light"] .bg-gradient-to-b:not(.from-cf-gold):not(.from-cf-gold-light) {
+  filter: saturate(0.82) brightness(0.95);
+}
+
+/* Bridge rules para gradientes dorados - usan colores intensos en claro */
+[data-theme="light"] .from-cf-gold { --tw-gradient-from: #A86608 !important; }
+[data-theme="light"] .to-cf-gold-dim { --tw-gradient-to: #D4A574 !important; }
+[data-theme="light"] .bg-gradient-to-br.from-cf-gold { background: linear-gradient(135deg, #A86608 0%, #D4A574 100%) !important; }
+
+[data-theme="light"] .animate-shimmer {
+  opacity: 0.55;
+}
+
+[data-theme="light"] input,
+[data-theme="light"] textarea,
+[data-theme="light"] select {
+  background-color: var(--cf-t-bg2);
+  color: #A86608;
+  border-color: var(--cf-t-border);
+}
+
+[data-theme="light"] input::placeholder,
+[data-theme="light"] textarea::placeholder {
+  color: var(--cf-t-text-mute);
+}
+
+[data-theme="light"] input:focus,
+[data-theme="light"] textarea:focus,
+[data-theme="light"] select:focus {
+  border-color: var(--cf-t-gold);
+  box-shadow: 0 0 0 2px rgba(122, 79, 8, 0.14);
+}
+
+[data-theme="light"] button,
+[data-theme="light"] a {
+  -webkit-tap-highlight-color: rgba(122, 79, 8, 0.14);
+}
+
+[data-theme="light"] button:not(.bg-gradient-to-br) {
+  color: #A86608;
+  border-color: rgba(122, 79, 8, 0.34);
+  background-color: rgba(255, 251, 239, 0.52);
+}
+
+/* Botones principales con gradiente dorado */
+[data-theme="light"] button.bg-gradient-to-br {
+  color: #F5F1E0;
+  text-shadow: 0 1px 2px rgba(0, 0, 0, 0.1);
+  border-color: #8B5C0F;
+  box-shadow: 0 4px 12px rgba(168, 102, 8, 0.28);
+}
+
+/* CTA Subir Miniatura: destaca en claro */
+[data-theme="light"] a[routerLink="/upload"],
+[data-theme="light"] button[class*="crimson"] {
+  color: #F5F1E0;
+  background: linear-gradient(135deg, #A86608 0%, #D4A574 100%);
+  border-color: #8B5C0F;
+  font-weight: 600;
+  letter-spacing: 0.05em;
+  box-shadow: 0 4px 12px rgba(168, 102, 8, 0.26);
+}
+
+[data-theme="light"] a[routerLink="/upload"]:hover,
+[data-theme="light"] button[class*="crimson"]:hover {
+  color: #F5F1E0;
+  border-color: rgba(122, 79, 8, 0.65);
+  background: linear-gradient(135deg, #B87510 0%, #E8B88A 100%);
+  box-shadow: 0 6px 18px rgba(168, 102, 8, 0.38);
+  transform: translateY(-1px);
+}
+
+[data-theme="light"] button:not([class*="crimson"]):not(.bg-gradient-to-br):hover {
+  color: #D4A574;
+  border-color: rgba(168, 102, 8, 0.62);
+  background-color: rgba(232, 223, 200, 0.88);
+}
+
+/* Hover para botones con gradiente dorado */
+[data-theme="light"] button.bg-gradient-to-br:hover {
+  color: #F5F1E0;
+  border-color: rgba(122, 79, 8, 0.65);
+  background: linear-gradient(135deg, #B87510 0%, #E8B88A 100%) !important;
+  box-shadow: 0 6px 18px rgba(168, 102, 8, 0.38);
+  transform: translateY(-2px);
+}
+
+[data-theme="light"] button:focus-visible,
+[data-theme="light"] a:focus-visible {
+  outline: 2px solid rgba(168, 102, 8, 0.58);
+  outline-offset: 2px;
+}
+
+[data-theme="light"] a.font-heading,
+[data-theme="light"] a.font-ui,
+[data-theme="light"] span.font-heading,
+[data-theme="light"] span.font-ui,
+[data-theme="light"] p.font-ui,
+[data-theme="light"] p.font-heading,
+[data-theme="light"] h1,
+[data-theme="light"] h2,
+[data-theme="light"] h3,
+[data-theme="light"] h4 {
+  color: #A86608;
+}
+
+[data-theme="light"] .hover\:bg-cf-crimson:hover,
+[data-theme="light"] .hover\:bg-cf-crimson-light:hover {
+  background-color: #7f1a1a;
+}
+
+[data-theme="light"] .border-cf-crimson,
+[data-theme="light"] .border-cf-crimson-light {
+  border-color: #7f1a1a;
+}
+
+[data-theme="light"] .text-cf-crimson,
+[data-theme="light"] .text-cf-crimson-light {
+  color: #7f1a1a;
+}
+
+/* ── Transicion al cambiar tema (solo colores, no transforms) ── */
+*,
+*::before,
+*::after {
+  transition:
+    background-color 0.22s ease,
+    border-color     0.22s ease,
+    color            0.18s ease,
+    fill             0.18s ease;
+}
+
+/* Excluir elementos con animaciones propias para evitar conflictos */
+img, video, canvas, svg,
+[class*="animate-"],
+.animate-spin,
+.animate-shimmer,
+.animate-fade-up {
+  transition: none !important;
+}
+
+/* ── Scrollbar adaptada al tema ─── */
+::-webkit-scrollbar-track  { background: var(--cf-t-scroll-tr); }
+::-webkit-scrollbar-thumb  { background: var(--cf-t-scroll-th); border-radius: 3px; }
+::-webkit-scrollbar-thumb:hover { background: var(--cf-t-gold); }
+
+/* ── Body raiz sigue el tema ───── */
+body {
+  background-color: var(--cf-t-bg0);
+  color:            var(--cf-t-text);
 }

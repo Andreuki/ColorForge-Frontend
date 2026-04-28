@@ -67,18 +67,7 @@
   </div>
 
   @if (loading()) {
-    <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-7">
-      @for (slot of [1,2,3]; track slot) {
-        <article class="relative overflow-hidden border border-gold-subtle bg-cf-surface2 p-4 shadow-card animate-fade-up">
-          <div class="aspect-[4/3] bg-cf-surface3"></div>
-          <div class="mt-4 space-y-2">
-            <div class="h-3 w-20 bg-cf-steel"></div>
-            <div class="h-4 w-full bg-cf-surface3"></div>
-            <div class="h-4 w-3/4 bg-cf-surface3"></div>
-          </div>
-        </article>
-      }
-    </div>
+    <app-forge-loader message="Cargando miniaturas..." />
   }
 
   @if (!loading() && errorMessage()) {

@@ -1,10 +1,11 @@
-import { ChangeDetectionStrategy, Component, effect, inject, signal } from '@angular/core';
+import { ChangeDetectionStrategy, Component, effect, inject, signal, HostListener } from '@angular/core';
 import { DatePipe } from '@angular/common';
 import { RouterOutlet, RouterLink, RouterLinkActive, Router } from '@angular/router';
 import { AuthService } from './core/services/auth.service';
 import { Notification } from './shared/models/notification.model';
 import { ToastContainerComponent } from './shared/components/toast-container/toast-container.component';
 import { NotificationService } from './shared/services/notification.service';
+import { ThemeService } from './core/services/theme.service';
 import { toAbsoluteUrl, onAvatarError } from './shared/utils/url.helper';
 
 @Component({
@@ -17,6 +18,7 @@ import { toAbsoluteUrl, onAvatarError } from './shared/utils/url.helper';
 })
 export class AppComponent {
   readonly authService = inject(AuthService);
+  readonly themeService = inject(ThemeService);
   readonly #notificationService = inject(NotificationService);
   readonly #router = inject(Router);
 
@@ -29,6 +31,7 @@ export class AppComponent {
 
   // Estado del menú hamburguesa en móvil
   menuOpen = signal(false);
+  isScrolled = signal(false);
 
   constructor() {
     effect(() => {
@@ -102,5 +105,13 @@ export class AppComponent {
   logout(): void {
     this.authService.logout();
     this.closeMenu();
+  }
+
+  @HostListener('window:scroll')
+  onScroll(): void {
+    const scrolled = window.scrollY > 10;
+    if (this.isScrolled() !== scrolled) {
+      this.isScrolled.set(scrolled);
+    }
   }
 }

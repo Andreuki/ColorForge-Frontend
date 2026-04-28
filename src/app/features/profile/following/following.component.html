@@ -1,20 +1,20 @@
-<section class="mx-auto min-h-screen max-w-4xl px-6 py-10 text-[#F0EDE4] bg-[#0d0d0d]">
-  <div class="rounded-xl bg-[#1a1a1a] border border-[#2a2a1a] p-6">
-    <h1 class="text-2xl font-bold text-[#C8922A] mb-4" style="font-family: var(--font-heading)">Siguiendo</h1>
+<section class="mx-auto min-h-screen max-w-4xl px-6 py-10 text-cf-parchment bg-cf-black">
+  <div class="rounded-sm bg-cf-surface2 border border-gold-subtle p-6 shadow-card">
+    <h1 class="text-2xl font-heading uppercase tracking-widest-cf text-cf-gold mb-6">Siguiendo</h1>
 
     @if (loading()) {
-      <p class="text-[#8A8070]">Cargando seguidos...</p>
+      <p class="text-cf-parchment-muted">Cargando seguidos...</p>
     } @else if (error()) {
-      <p class="text-red-300">{{ error() }}</p>
+      <p class="text-cf-crimson-light">{{ error() }}</p>
     } @else if (following().length === 0) {
-      <p class="text-[#8A8070]">Este usuario aún no sigue a nadie.</p>
+      <p class="text-cf-parchment-muted">Este usuario aún no sigue a nadie.</p>
     } @else {
       <div class="grid grid-cols-1 sm:grid-cols-2 gap-3">
         @for (user of following(); track user._id) {
-          <div class="flex items-center gap-3 rounded-lg bg-[#111] border border-[#2a2a2a] p-3 hover:border-[#C8922A] transition-colors">
+          <div class="flex items-center gap-3 rounded-sm bg-cf-surface border border-gold-subtle p-3 hover:border-cf-gold hover:shadow-gold-sm transition-all">
             <a [routerLink]="['/user', user._id]" class="flex min-w-0 flex-1 items-center gap-3">
               <img [src]="toAbsoluteUrl(user.avatar)" class="h-10 w-10 rounded-full object-cover" [alt]="user.username || user.name" />
-              <span class="min-w-0 truncate font-semibold">{{ user.username || user.name }}</span>
+              <span class="min-w-0 truncate font-ui text-cf-parchment">{{ user.username || user.name }}</span>
             </a>
 
             @if (isOwnProfile()) {

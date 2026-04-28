@@ -1,19 +1,19 @@
-<section class="mx-auto min-h-screen max-w-4xl px-6 py-10 text-[#F0EDE4] bg-[#0d0d0d]">
-  <div class="rounded-xl bg-[#1a1a1a] border border-[#2a2a1a] p-6">
-    <h1 class="text-2xl font-bold text-[#C8922A] mb-4" style="font-family: var(--font-heading)">Seguidores</h1>
+<section class="mx-auto min-h-screen max-w-4xl px-6 py-10 text-cf-parchment bg-cf-black">
+  <div class="rounded-sm bg-cf-surface2 border border-gold-subtle p-6 shadow-card">
+    <h1 class="text-2xl font-heading uppercase tracking-widest-cf text-cf-gold mb-6">Seguidores</h1>
 
     @if (loading()) {
-      <p class="text-[#8A8070]">Cargando seguidores...</p>
+      <p class="text-cf-parchment-muted">Cargando seguidores...</p>
     } @else if (error()) {
-      <p class="text-red-300">{{ error() }}</p>
+      <p class="text-cf-crimson-light">{{ error() }}</p>
     } @else if (followers().length === 0) {
-      <p class="text-[#8A8070]">Este usuario aún no tiene seguidores.</p>
+      <p class="text-cf-parchment-muted">Este usuario aún no tiene seguidores.</p>
     } @else {
       <div class="grid grid-cols-1 sm:grid-cols-2 gap-3">
         @for (user of followers(); track user._id) {
-          <a [routerLink]="['/user', user._id]" class="flex items-center gap-3 rounded-lg bg-[#111] border border-[#2a2a1a] p-3 hover:border-[#C8922A] transition-colors">
+          <a [routerLink]="['/user', user._id]" class="flex items-center gap-3 rounded-sm bg-cf-surface border border-gold-subtle p-3 hover:border-cf-gold hover:shadow-gold-sm transition-all">
             <img [src]="toAbsoluteUrl(user.avatar)" class="h-10 w-10 rounded-full object-cover" [alt]="user.username || user.name" />
-            <span class="font-semibold">{{ user.username || user.name }}</span>
+            <span class="font-ui text-cf-parchment">{{ user.username || user.name }}</span>
           </a>
         }
       </div>

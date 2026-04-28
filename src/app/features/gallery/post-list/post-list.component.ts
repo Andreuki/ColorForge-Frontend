@@ -7,13 +7,14 @@ import { ChallengeService } from '../../../core/services/challenge.service';
 import { Post } from '../../../shared/models/post.model';
 import { ToastService } from '../../../shared/services/toast.service';
 import { ConfirmDialogComponent } from '../../../shared/components/confirm-dialog/confirm-dialog.component';
+import { ForgeLoaderComponent } from '../../../shared/components/forge-loader/forge-loader.component';
 import { getUserId } from '../../../shared/models/user.model';
 import { toAbsoluteUrl } from '../../../shared/utils/url.helper';
 
 @Component({
   selector: 'app-post-list',
   standalone: true,
-  imports: [DatePipe, RouterLink, ConfirmDialogComponent],
+  imports: [DatePipe, RouterLink, ConfirmDialogComponent, ForgeLoaderComponent],
   templateUrl: './post-list.component.html',
   styleUrls: ['./post-list.component.css'],
   changeDetection: ChangeDetectionStrategy.OnPush,

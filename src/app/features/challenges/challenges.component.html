@@ -28,6 +28,10 @@
       </button>
     </div>
 
+    @if (loading()) {
+      <app-forge-loader message="Cargando retos..." />
+    }
+
     <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
       @for (challenge of challenges(); track challenge._id) {
         <a

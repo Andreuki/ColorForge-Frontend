@@ -5,13 +5,13 @@
     <div class="rounded-sm bg-cf-surface2 p-6 shadow-md border border-gold-subtle">
       @if (profileResource.isLoading()) {
         <div class="text-center py-20">
-          <p class="text-[#b8960c] font-serif italic">
+          <p class="text-cf-parchment-muted font-body italic">
             Cargando perfil...
           </p>
         </div>
       } @else if (!user()) {
         <div class="text-center py-20">
-          <p class="text-[#b8960c] font-serif italic">
+          <p class="text-cf-parchment-muted font-body italic">
             No se pudo cargar el perfil
           </p>
         </div>
@@ -99,7 +99,7 @@
           <div class="flex w-full flex-col gap-3 md:w-auto">
             <button
               type="button"
-              class="rounded-sm bg-cf-gold px-4 py-2 text-sm font-heading uppercase tracking-widest text-cf-black hover:bg-cf-gold-light"
+              class="rounded-sm border border-cf-gold px-5 py-2.5 font-heading text-[0.72rem] uppercase tracking-widest-cf text-cf-parchment transition-all duration-200 hover:bg-cf-gold hover:text-cf-black active:scale-95"
               (click)="openEdit('profile')"
             >
               Editar perfil

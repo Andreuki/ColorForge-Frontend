@@ -29,6 +29,10 @@
       </a>
     }
 
+    @if (loading()) {
+      <app-forge-loader message="Calculando la clasificación..." />
+    }
+
     <div class="w-full overflow-x-auto border border-gold-subtle bg-cf-surface2 rounded-sm shadow-card">
       <table class="w-full border-collapse font-ui text-sm">
         <thead class="border-b border-gold-subtle">

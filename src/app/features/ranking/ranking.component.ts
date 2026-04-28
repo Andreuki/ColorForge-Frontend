@@ -1,10 +1,11 @@
-import { ChangeDetectionStrategy, Component, OnInit, inject, signal } from '@angular/core';
+import { ChangeDetectionStrategy, Component, OnInit, computed, inject, signal } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
 import { DatePipe } from '@angular/common';
 import { RouterLink } from '@angular/router';
 import { environment } from '../../../environments/environment';
 import { ChallengeService } from '../../core/services/challenge.service';
 import { ForgeBadgeComponent } from '../../shared/components/forge-badge/forge-badge.component';
+import { ForgeLoaderComponent } from '../../shared/components/forge-loader/forge-loader.component';
 import { PageWrapperComponent } from '../../shared/components/page-wrapper/page-wrapper.component';
 import { SectionTitleComponent } from '../../shared/components/section-title/section-title.component';
 import { toAbsoluteUrl, onAvatarError } from '../../shared/utils/url.helper';
@@ -12,7 +13,7 @@ import { toAbsoluteUrl, onAvatarError } from '../../shared/utils/url.helper';
 @Component({
   selector: 'app-ranking',
   standalone: true,
-  imports: [DatePipe, ForgeBadgeComponent, RouterLink, PageWrapperComponent, SectionTitleComponent],
+  imports: [DatePipe, ForgeBadgeComponent, ForgeLoaderComponent, RouterLink, PageWrapperComponent, SectionTitleComponent],
   changeDetection: ChangeDetectionStrategy.OnPush,
   templateUrl: './ranking.component.html',
 })
@@ -25,11 +26,22 @@ export class RankingComponent {
   users = signal<any[]>([]);
   activeChallenge = signal<any>(null);
   challengePosts = signal<any[]>([]);
+  private readonly loadingState = signal(true);
+  readonly loading = computed(() => this.loadingState());
 
   ngOnInit(): void {
     this.#http
       .get<{ data: any[] }>(`${environment.apiUrl}/api/users/ranking`)
-      .subscribe((res) => this.users.set(res.data));
+      .subscribe({
+        next: (res) => {
+          this.users.set(res.data);
+          this.loadingState.set(false);
+        },
+        error: () => {
+          this.users.set([]);
+          this.loadingState.set(false);
+        },
+      });
 
     this.#challengeService.getActive().subscribe({
       next: (res) => {
