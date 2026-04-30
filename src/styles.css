@@ -93,6 +93,12 @@ div[aria-hidden="true"] {
   pointer-events: none !important;
 }
 
+/* En claro el watermark debe cubrir el viewport para evitar franjas laterales */
+[data-theme="light"] div[aria-hidden="true"] {
+  background-size: cover !important;
+  background-position: center top !important;
+}
+
 /* Texto blanco/crema en botones con gradiente dorado (para contraste) */
 [data-theme="light"] button.bg-gradient-to-br.text-cf-black,
 [data-theme="light"] button.bg-gradient-to-br .text-cf-black {
@@ -299,6 +305,23 @@ div[aria-hidden="true"] {
   transform: translateY(-1px);
 }
 
+/* Navbar: estado hover/activo de "Subir miniatura" más claro y legible */
+[data-theme="light"] header a[routerLink="/upload"],
+[data-theme="light"] nav a[routerLink="/upload"] {
+  color: #F5F1E0 !important;
+  background: linear-gradient(135deg, #B87510 0%, #E2B17D 100%) !important;
+  border-color: #8B5C0F !important;
+}
+
+[data-theme="light"] header a[routerLink="/upload"]:hover,
+[data-theme="light"] nav a[routerLink="/upload"]:hover,
+[data-theme="light"] header a[routerLink="/upload"].text-cf-gold,
+[data-theme="light"] nav a[routerLink="/upload"].text-cf-gold {
+  color: #FFF7E6 !important;
+  background: linear-gradient(135deg, #C6841A 0%, #EDC69A 100%) !important;
+  box-shadow: 0 6px 16px rgba(168, 102, 8, 0.30);
+}
+
 [data-theme="light"] button:not([class*="crimson"]):not(.bg-gradient-to-br):hover {
   color: #D4A574;
   border-color: rgba(168, 102, 8, 0.62);
@@ -361,6 +384,32 @@ div[aria-hidden="true"] {
 [data-theme="light"] .text-cf-crimson,
 [data-theme="light"] .text-cf-crimson-light {
   color: #7f1a1a;
+}
+
+/* Upload (tema claro): zona de arrastre y hover sin bloque oscuro */
+[data-theme="light"] app-page-wrapper .border-dashed.bg-cf-surface {
+  background-color: #DDD3B8 !important;
+  background-image: linear-gradient(180deg, rgba(255, 252, 241, 0.22), rgba(255, 252, 241, 0.04));
+  border-color: rgba(168, 102, 8, 0.36) !important;
+  color: #4A3318 !important;
+}
+
+[data-theme="light"] app-page-wrapper .border-dashed.bg-cf-surface:hover {
+  background-color: #E8DFC8 !important;
+  background-image: linear-gradient(180deg, rgba(255, 252, 241, 0.32), rgba(255, 252, 241, 0.10));
+  border-color: rgba(168, 102, 8, 0.62) !important;
+  box-shadow: 0 8px 20px rgba(168, 102, 8, 0.14);
+}
+
+[data-theme="light"] app-page-wrapper .border-dashed.bg-cf-surface label[for="fileInput"] {
+  color: #6B4516 !important;
+  border-color: rgba(168, 102, 8, 0.40) !important;
+}
+
+[data-theme="light"] app-page-wrapper .border-dashed.bg-cf-surface label[for="fileInput"]:hover {
+  color: #A86608 !important;
+  border-color: rgba(168, 102, 8, 0.72) !important;
+  background-color: rgba(255, 247, 227, 0.55);
 }
 
 /* ── Transicion al cambiar tema (solo colores, no transforms) ── */
