@@ -333,6 +333,21 @@ div[aria-hidden="true"] {
   color: #A86608;
 }
 
+/* Hover de tablas/listados en claro (ranking + admin): evita bloque demasiado oscuro */
+[data-theme="light"] .hover\:bg-cf-surface3:hover,
+[data-theme="light"] tr.hover\:bg-cf-surface3:hover,
+[data-theme="light"] .cursor-pointer.hover\:bg-cf-surface3:hover {
+  background-color: rgba(168, 102, 8, 0.14) !important;
+  background-image: linear-gradient(90deg, rgba(255, 250, 236, 0.44), rgba(255, 250, 236, 0.12));
+}
+
+/* Refuerza legibilidad del contenido dentro del hover en claro */
+[data-theme="light"] tr.hover\:bg-cf-surface3:hover td,
+[data-theme="light"] tr.hover\:bg-cf-surface3:hover span,
+[data-theme="light"] tr.hover\:bg-cf-surface3:hover p,
+[data-theme="light"] .cursor-pointer.hover\:bg-cf-surface3:hover {
+  color: #2b1d0c;
+}
 [data-theme="light"] .hover\:bg-cf-crimson:hover,
 [data-theme="light"] .hover\:bg-cf-crimson-light:hover {
   background-color: #7f1a1a;
